@@ -45,5 +45,6 @@ app-example
 /android
 
 google-services.json
+google-services(dev).json
 service_account_key.json
 whispa-release-key.keystore

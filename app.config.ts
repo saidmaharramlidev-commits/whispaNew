@@ -10,11 +10,16 @@ const config: ExpoConfig = {
   icon: "./assets/images/Logo.png",
   scheme: "whispa",
   userInterfaceStyle: "automatic",
+
   ios: {
     supportsTablet: true,
     bundleIdentifier: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
+
+    googleServicesFile: isDevelopment
+      ? "./GoogleService-Info-Dev.plist"
+      : "./GoogleService-Info.plist",
   },
 
   android: {
@@ -24,7 +29,9 @@ const config: ExpoConfig = {
 
     versionCode: 1,
 
-    googleServicesFile: "./google-services.json",
+    googleServicesFile: isDevelopment
+      ? "./google-services(dev).json"
+      : "./google-services.json",
 
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
@@ -72,9 +79,9 @@ const config: ExpoConfig = {
     reactCompiler: true
   },
 
-  "extra": {
-    "eas": {
-      "projectId": "fdba0e63-d55b-4f71-9ff3-f603a5dc8070"
+  extra: {
+    eas: {
+      projectId: "fdba0e63-d55b-4f71-9ff3-f603a5dc8070"
     }
   },
 
