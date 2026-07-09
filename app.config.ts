@@ -4,7 +4,7 @@ const isDevelopment = process.env.APP_VARIANT === "development";
 
 const config: ExpoConfig = {
   name: "WhispaMe",
-  slug: "Whispa",
+  slug: "WhispaMe",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/Logo.png",
@@ -72,10 +72,9 @@ const config: ExpoConfig = {
     reactCompiler: true
   },
 
-  extra: {
-    router: {},
-    eas: {
-      projectId: "6c5d0898-0c64-417a-9e65-d2673717f152"
+  "extra": {
+    "eas": {
+      "projectId": "fdba0e63-d55b-4f71-9ff3-f603a5dc8070"
     }
   },
 
