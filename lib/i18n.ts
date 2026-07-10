@@ -50,7 +50,7 @@ const i18n = new I18n({
         // Home Screen
         liked: "❤️ Liked",
         allCaughtUp: "You're all caught up",
-        noMoreWhispas: "No more Whispa to review",
+        noMoreWhispas: "Pull down to refresh for new Whispas",
 
         // Liked Overlay
         likedWhispas: "Liked Whispas",
@@ -143,6 +143,13 @@ const i18n = new I18n({
         messageSent: "Message sent!",
         tapToClose: "Tap anywhere to close",
         remove: "Remove",
+
+
+        deleteWhispa: "Delete Whispa",
+        shareWhispa: "Share Whispa",
+        reportWhispa: "Report / Block",
+        forbiddenWord: "Your message contains inappropriate language.",
+        noInternet: "No internet connection",
     },
 
     az: {
@@ -194,7 +201,7 @@ const i18n = new I18n({
         // Home Screen
         liked: "❤️ Bəyənilənlər",
         allCaughtUp: "Hamısına baxdınız",
-        noMoreWhispas: "Baxılacaq Whispa qalmadı",
+        noMoreWhispas: "Yeni Whispaları yeniləmək üçün aşağı çəkin",
 
         // Liked Overlay
         likedWhispas: "Bəyənilən Whispalar",
@@ -288,6 +295,13 @@ const i18n = new I18n({
 
         tapToClose: "Bağlamaq üçün istənilən yerə toxunun",
         remove: "Sil",
+
+
+        deleteWhispa: "Whispanı Sil",
+        shareWhispa: "Whispanı Paylaş",
+        reportWhispa: "Şikayət Et / Blokla",
+        forbiddenWord: "Mesajınızda uygunsuz söz var.",
+        noInternet: "İnternet bağlantısı yoxdur",
 
 
     },

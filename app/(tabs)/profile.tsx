@@ -3,10 +3,11 @@ import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type UserProfile = {
@@ -28,11 +29,12 @@ type FollowUser = {
 
 export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
-    const { isLoaded } = useAuth();
+    const { isLoaded, isSignedIn } = useAuth();
     const api = useApi();
 
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState("");
     const [modalType, setModalType] = useState<"followers" | "following">("followers");
     const [modalVisible, setModalVisible] = useState(false);
@@ -41,43 +43,53 @@ export default function ProfileScreen() {
     const [followLoading, setFollowLoading] = useState(false);
 
     useEffect(() => {
-        if (isLoaded) fetchProfile();
-    }, [isLoaded]);
+        if (isLoaded && isSignedIn) {
+            fetchProfile(false);
+        } else if (isLoaded && !isSignedIn) {
+            setLoading(false);
+        }
+    }, [isLoaded, isSignedIn]);
 
-    const fetchProfile = async () => {
+    const fetchProfile = async (background = false) => {
         try {
-            setLoading(true);
+            if (!background) setLoading(true);
             const data = await api.getMe();
             setUser(data.data);
-            setAvatarUrl(data.data.avatarUrl);
+            setAvatarUrl(data.data.avatarUrl || "");
         } catch (err) {
             console.error("Failed to load profile:", err);
         } finally {
-            setLoading(false);
+            if (!background) setLoading(false);
+            setRefreshing(false);
         }
     };
 
-    const handleRemoveFollower = (username: string) => {
-        setFollowers(prev => prev.filter(f => f.username !== username))
-    }
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchProfile(true);
+    };
 
+    const handleRemoveFollower = (username: string) => {
+        setFollowers(prev => prev.filter(f => f.username !== username));
+        api.removeFollower(username).catch(err =>
+            console.error("Failed to remove follower:", err)
+        );
+    };
 
     const fetchFollowers = async () => {
         try {
             if (!user) return;
-            const data = await api.getFollowers(user!.username);
+            const data = await api.getFollowers(user.username);
             setFollowers(data.data);
         } catch (err) {
             console.error("Failed to load followers:", err);
         }
     };
 
-
-
     const fetchFollowing = async () => {
         try {
             if (!user) return;
-            const data = await api.getFollowing(user!.username);
+            const data = await api.getFollowing(user.username);
             setFollowing(data.data);
         } catch (err) {
             console.error("Failed to load following:", err);
@@ -88,7 +100,6 @@ export default function ProfileScreen() {
         setModalType(type);
         setModalVisible(true);
         setFollowLoading(true);
-
         try {
             if (type === "followers") {
                 await fetchFollowers();
@@ -115,25 +126,43 @@ export default function ProfileScreen() {
         });
 
         if (!result.canceled) {
-            const uri = result.assets[0].uri;
+            const asset = result.assets[0];
+            const uri = asset.uri;
+            const mimeType = asset.mimeType || "image/jpeg";
 
             try {
-                const formData = new FormData();
-                formData.append("file", { uri, type: "image/jpeg", name: "avatar.jpg" } as any);
-                formData.append("upload_preset", process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+                const base64 = await FileSystem.readAsStringAsync(uri, {
+                    encoding: FileSystem.EncodingType.Base64,
+                });
 
                 const response = await fetch(
                     `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-                    { method: "POST", body: formData }
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            file: `data:${mimeType};base64,${base64}`,
+                            upload_preset: process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+                        }),
+                    }
                 );
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    console.error("Cloudinary error:", errData);
+                    alert(i18n.t("failedToUploadAvatar"));
+                    return;
+                }
 
                 const data = await response.json();
                 const cloudUrl = data.secure_url;
 
                 setAvatarUrl(cloudUrl);
                 await api.updateMe({ avatarUrl: cloudUrl });
+
             } catch (err) {
                 console.error("Failed to upload avatar:", err);
+                alert(i18n.t("failedToUploadAvatar"));
             }
         }
     };
@@ -164,8 +193,8 @@ export default function ProfileScreen() {
                 loading={followLoading}
                 currentUserFollowing={user.following.map((f: any) => f._id ?? f)}
                 onClose={() => setModalVisible(false)}
-                onFollowToggle={fetchProfile}
-                onRefresh={fetchProfile}
+                onFollowToggle={() => fetchProfile(true)}
+                onRefresh={() => fetchProfile(true)}
                 onRemoveFollower={handleRemoveFollower}
             />
 
@@ -174,6 +203,15 @@ export default function ProfileScreen() {
                 keyExtractor={() => "key"}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor="#1DB954"
+                        colors={["#1DB954"]}
+                        progressBackgroundColor="#000000"
+                    />
+                }
                 ListHeaderComponent={() => (
                     <View className="px-6">
 

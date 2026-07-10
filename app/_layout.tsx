@@ -11,6 +11,7 @@ import { Slot, router, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -69,6 +70,32 @@ function InitialLayout() {
       </View>
     )
   }
+
+  useEffect(() => {
+    const handleUrl = (url: string) => {
+      const parsed = Linking.parse(url);
+      // handle whispame://user/username
+      if (parsed.scheme === 'whispame' && parsed.path?.startsWith('user/')) {
+        const username = parsed.path.replace('user/', '');
+        if (username) router.push(`/user/${username}` as any);
+      }
+      // handle https://feedbackapp-drsj.onrender.com/u/username
+      if (parsed.path?.startsWith('u/')) {
+        const username = parsed.path.replace('u/', '');
+        if (username) router.push(`/user/${username}` as any);
+      }
+    };
+
+    // app already open
+    const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
+
+    // app opened from closed state
+    Linking.getInitialURL().then((url) => {
+      if (url) handleUrl(url);
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   return (
     <>

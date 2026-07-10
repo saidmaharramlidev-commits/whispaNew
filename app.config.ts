@@ -8,7 +8,7 @@ const config: ExpoConfig = {
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/Logo.png",
-  scheme: "whispa",
+  scheme: "whispame",  // ← changed from "whispa" to "whispame" for consistency
   userInterfaceStyle: "automatic",
 
   ios: {
@@ -16,33 +16,51 @@ const config: ExpoConfig = {
     bundleIdentifier: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-
     googleServicesFile: isDevelopment
       ? "./GoogleService-Info-Dev.plist"
       : "./GoogleService-Info.plist",
+    associatedDomains: ["applinks:feedbackapp-drsj.onrender.com"],
   },
 
   android: {
     package: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-
-    versionCode: 1,
-
+    versionCode: 2,
     googleServicesFile: isDevelopment
       ? "./google-services(dev).json"
       : "./google-services.json",
-
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/Logo.png",
       monochromeImage: "./assets/images/Logo.png",
     },
-
     predictiveBackGestureEnabled: false,
-
     permissions: [
       "android.permission.RECORD_AUDIO"
+    ],
+    intentFilters: [
+      {
+        action: "VIEW",
+        autoVerify: true,
+        data: [
+          {
+            scheme: "https",
+            host: "feedbackapp-drsj.onrender.com",
+            pathPrefix: "/u"
+          }
+        ],
+        category: ["BROWSABLE", "DEFAULT"]
+      },
+      {
+        action: "VIEW",
+        data: [
+          {
+            scheme: "whispame"
+          }
+        ],
+        category: ["BROWSABLE", "DEFAULT"]
+      }
     ]
   },
 

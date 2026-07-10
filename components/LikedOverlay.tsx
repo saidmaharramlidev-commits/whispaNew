@@ -1,6 +1,8 @@
+import WhispaActionModal from "@/components/WhispaActionModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -10,14 +12,38 @@ type Props = { likedFeedbacks: Feedback[]; onClose: () => void; onUnlike: (id: s
 export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Props) {
     const insets = useSafeAreaInsets();
     const api = useApi();
+    const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+    const [showActionModal, setShowActionModal] = useState(false);
 
-    const handleUnlike = async (id: string) => {
-        onUnlike(id);
+    const openActionModal = (feedback: Feedback) => {
+        setSelectedFeedback(feedback);
+        setShowActionModal(true);
+    };
+
+    const closeActionModal = () => {
+        setShowActionModal(false);
+        setSelectedFeedback(null);
+    };
+
+    const handleDelete = async () => {
+        if (!selectedFeedback) return;
+        closeActionModal();
+        onUnlike(selectedFeedback._id);
         try {
-            await api.deleteFeedback(id);
+            await api.deleteFeedback(selectedFeedback._id);
         } catch (err) {
             console.error("Failed to delete feedback:", err);
         }
+    };
+
+    const handleShare = () => {
+        closeActionModal();
+        // share logic later
+    };
+
+    const handleReport = () => {
+        closeActionModal();
+        // report/block logic later
     };
 
     return (
@@ -25,6 +51,7 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
             className="absolute top-0 left-0 right-0 bottom-0 bg-black z-50 px-6"
             style={{ paddingTop: insets.top }}
         >
+            {/* Header */}
             <View className="flex-row justify-between items-center my-6">
                 <Text className="text-white text-xl font-bold">{i18n.t("likedWhispas")}</Text>
                 <TouchableOpacity
@@ -35,6 +62,7 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                 </TouchableOpacity>
             </View>
 
+            {/* Empty State */}
             {likedFeedbacks.length === 0 ? (
                 <View className="flex-1 justify-center items-center gap-4">
                     <Text className="text-5xl">❤️</Text>
@@ -51,20 +79,42 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                     contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
                     renderItem={({ item }) => (
                         <View className="bg-[#111] rounded-2xl p-5 mb-3 border border-[#282828]">
-                            <View className="flex-row items-start gap-3">
-                                <Text className="text-white text-base leading-6 flex-1">{item.text}</Text>
+                            <View className="flex-row items-start justify-between gap-3">
+                                {/* Whispa text — flex-1 ensures it never pushes the dots */}
+                                <Text
+                                    className="text-white leading-6 flex-1"
+                                    style={{
+                                        fontSize: item.text.length > 120 ? 14 : item.text.length > 60 ? 15 : 16,
+                                        lineHeight: item.text.length > 120 ? 22 : 24,
+                                    }}
+                                >
+                                    {item.text}
+                                </Text>
+
+                                {/* Dots — always pinned to right, never pushed */}
                                 <TouchableOpacity
-                                    onPress={() => handleUnlike(item._id)}
-                                    className="bg-[#1a1a1a] rounded-full p-1.5 border border-[#282828] mt-0.5"
+                                    onPress={() => openActionModal(item)}
+                                    className="bg-[#1a1a1a] rounded-full p-2 border border-[#282828]"
+                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                                     style={{ alignSelf: "flex-start" }}
                                 >
-                                    <Ionicons name="close" size={14} color="#555" />
+                                    <Ionicons name="ellipsis-horizontal" size={16} color="#888" />
                                 </TouchableOpacity>
                             </View>
                         </View>
                     )}
                 />
             )}
+
+            {/* Action Modal */}
+            <WhispaActionModal
+                visible={showActionModal}
+                feedback={selectedFeedback}
+                onClose={closeActionModal}
+                onDelete={handleDelete}
+                onShare={handleShare}
+                onReport={handleReport}
+            />
         </View>
     );
 }

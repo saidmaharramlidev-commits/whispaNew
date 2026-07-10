@@ -1,5 +1,6 @@
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
+import { containsForbiddenWord } from "@/lib/wordFilter";
 import { useUser } from "@clerk/expo";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -69,15 +70,25 @@ export default function UserProfileScreen() {
 
     const handleSendFeedback = async () => {
         setFeedbackError("");
+
         if (feedbackText.trim().length < 2) {
             setFeedbackError(i18n.t("whispaTooShort"));
             return;
         }
+
         if (feedbackText.trim().length > 200) {
-            setFeedbackError("Whispa cannot exceed 200 characters");
+            setFeedbackError(i18n.t("whispaToLong"));
             return;
         }
+
+        // profanity check
+        if (containsForbiddenWord(feedbackText)) {
+            setFeedbackError(i18n.t("forbiddenWord"));
+            return;
+        }
+
         if (!feedbackText.trim()) return;
+
         try {
             setFeedbackLoading(true);
             await api.sendFeedback(user!.username, feedbackText);
