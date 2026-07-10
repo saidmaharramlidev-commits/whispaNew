@@ -1,12 +1,13 @@
 import ActionButtons from "@/components/ActionButtons";
 import FeedbackCard from "@/components/FeedbackCard";
 import LikedOverlay from "@/components/LikedOverlay";
+import ShareProfileModal from "@/components/ShareProfileModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, Share, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
@@ -28,6 +29,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [username, setUsername] = useState<string>("");
+  const [showShareModal, setShowShareModal] = useState(false);
+
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -96,16 +99,7 @@ export default function HomeScreen() {
       console.error("Failed to delete feedback:", err);
     }
   };
-  const handleShareProfile = async () => {
-    try {
-      await Share.share({
-        message: `Send me an anonymous whispa 👻\nhttps://feedbackapp-drsj.onrender.com/u/${username}`,
-        title: `@${username} on WhispaMe`,
-      });
-    } catch (err) {
-      console.error("Share error:", err);
-    }
-  };
+
 
   const currentFeedback = feedbacks[currentIndex];
   const isFinished = currentIndex >= feedbacks.length;
@@ -124,7 +118,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 py-4">
         <TouchableOpacity
-          onPress={handleShareProfile}
+          onPress={() => setShowShareModal(true)}  // ← was handleShareProfile
           className="bg-[#1a1a1a] p-2 rounded-full border border-[#282828]"
         >
           <Ionicons name="share-outline" size={20} color="#b3b3b3" />
@@ -145,6 +139,12 @@ export default function HomeScreen() {
           onUnlike={(id) => setLikedFeedbacks(prev => prev.filter(f => f._id !== id))}
         />
       )}
+
+      <ShareProfileModal
+        visible={showShareModal}
+        username={username}
+        onClose={() => setShowShareModal(false)}
+      />
 
       {/* Feed with pull to refresh */}
       <FlatList

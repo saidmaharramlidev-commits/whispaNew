@@ -63,14 +63,6 @@ function InitialLayout() {
     }
   }, [isSignedIn, permissionDenied])
 
-  if (!isLoaded) {
-    return (
-      <View className="flex-1 bg-black justify-center items-center">
-        <ActivityIndicator size="large" color="#1DB954" />
-      </View>
-    )
-  }
-
   useEffect(() => {
     const handleUrl = (url: string) => {
       const parsed = Linking.parse(url);
@@ -96,6 +88,16 @@ function InitialLayout() {
 
     return () => subscription.remove();
   }, []);
+
+  if (!isLoaded) {
+    return (
+      <View className="flex-1 bg-black justify-center items-center">
+        <ActivityIndicator size="large" color="#1DB954" />
+      </View>
+    )
+  }
+
+
 
   return (
     <>

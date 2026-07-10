@@ -150,6 +150,9 @@ const i18n = new I18n({
         reportWhispa: "Report / Block",
         forbiddenWord: "Your message contains inappropriate language.",
         noInternet: "No internet connection",
+        shareProfile: "Share Profile",
+        scanToWhispa: "Scan to send an anonymous whispa",
+        shareLink: "Share Link",
     },
 
     az: {
@@ -302,6 +305,9 @@ const i18n = new I18n({
         reportWhispa: "Şikayət Et / Blokla",
         forbiddenWord: "Mesajınızda uygunsuz söz var.",
         noInternet: "İnternet bağlantısı yoxdur",
+        shareProfile: "Profili Paylaş",
+        scanToWhispa: "Anonim whispa göndərmək üçün skan edin",
+        shareLink: "Linki Paylaş",
 
 
     },
