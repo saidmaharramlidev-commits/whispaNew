@@ -153,6 +153,7 @@ const i18n = new I18n({
         shareProfile: "Share Profile",
         scanToWhispa: "Scan to send an anonymous whispa",
         shareLink: "Share Link",
+        sharingWhispa: "Preparing your whispa...",
     },
 
     az: {
@@ -308,6 +309,7 @@ const i18n = new I18n({
         shareProfile: "Profili Paylaş",
         scanToWhispa: "Anonim whispa göndərmək üçün skan edin",
         shareLink: "Linki Paylaş",
+        sharingWhispa: "Whispa hazırlanır...",
 
 
     },

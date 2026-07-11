@@ -1,10 +1,12 @@
 import WhispaActionModal from "@/components/WhispaActionModal";
+import WhispaShareModal from "@/components/WhispaShareModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 type Feedback = { _id: string; text: string };
 type Props = { likedFeedbacks: Feedback[]; onClose: () => void; onUnlike: (id: string) => void };
@@ -14,6 +16,8 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
     const api = useApi();
     const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
     const [showActionModal, setShowActionModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [shareText, setShareText] = useState("");
 
     const openActionModal = (feedback: Feedback) => {
         setSelectedFeedback(feedback);
@@ -38,7 +42,10 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
 
     const handleShare = () => {
         closeActionModal();
-        // share logic later
+        if (selectedFeedback) {
+            setShareText(selectedFeedback.text);
+            setShowShareModal(true);
+        }
     };
 
     const handleReport = () => {
@@ -114,6 +121,12 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                 onDelete={handleDelete}
                 onShare={handleShare}
                 onReport={handleReport}
+            />
+
+            <WhispaShareModal
+                visible={showShareModal}
+                text={shareText}
+                onClose={() => setShowShareModal(false)}
             />
         </View>
     );
