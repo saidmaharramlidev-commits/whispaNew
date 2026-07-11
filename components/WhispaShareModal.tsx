@@ -1,10 +1,12 @@
 import i18n from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
-import { ActivityIndicator, Modal, Share, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import RNShare from "react-native-share";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 import WhispaShareCard from "./WhispaShareCard";
+
 
 type Props = {
     visible: boolean;
@@ -22,9 +24,10 @@ export default function WhispaShareModal({ visible, text, onClose }: Props) {
         try {
             setSharing(true);
             const uri = await viewShotRef.current.capture();
-            await Share.share({
-                url: uri, // iOS
-                message: `💬 Received an anonymous whispa on WhispaMe\nDownload: https://play.google.com/store/apps/details?id=com.saidovery.whispame`,
+            await RNShare.open({
+                url: `file://${uri}`,
+                type: "image/png",
+                failOnCancel: false,
             });
         } catch (err) {
             console.error("Share error:", err);

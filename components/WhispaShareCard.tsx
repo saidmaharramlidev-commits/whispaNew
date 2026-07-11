@@ -35,14 +35,7 @@ export default function WhispaShareCard({ text }: Props) {
                 justifyContent: "center",
                 paddingVertical: 32,
             }}>
-                {/* Green accent line */}
-                <View style={{
-                    width: 40,
-                    height: 3,
-                    backgroundColor: "#1DB954",
-                    borderRadius: 2,
-                    marginBottom: 20,
-                }} />
+
 
                 <Text style={{
                     color: "#ffffff",
@@ -54,15 +47,7 @@ export default function WhispaShareCard({ text }: Props) {
                     "{text}"
                 </Text>
 
-                {/* Bottom accent line */}
-                <View style={{
-                    width: 24,
-                    height: 3,
-                    backgroundColor: "#1DB954",
-                    borderRadius: 2,
-                    marginTop: 20,
-                    opacity: 0.5,
-                }} />
+
             </View>
 
             {/* Bottom — anonymous badge */}
@@ -85,9 +70,7 @@ export default function WhispaShareCard({ text }: Props) {
                     </Text>
                 </View>
 
-                <Text style={{ color: "#333", fontSize: 12, letterSpacing: 0.5 }}>
-                    whispame.app
-                </Text>
+
             </View>
         </View>
     );
