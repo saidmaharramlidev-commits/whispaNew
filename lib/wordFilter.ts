@@ -1,7 +1,7 @@
 const forbiddenWords = [
     // English
     "nigger", "faggot", "retard", "spic", "kike",
-    "cunt", "fuck", "shit", "bitch", "asshole", "cock",
+    "cunt", "fuck", "shit", "bitch", "asshole", "cock", "suck",
 
     // Azerbaijani — add your own
     "göt", "sik", "amcıq", "orospu", "qəhbə", "am", "döş",

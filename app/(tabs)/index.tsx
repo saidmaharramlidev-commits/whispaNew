@@ -2,14 +2,15 @@ import ActionButtons from "@/components/ActionButtons";
 import FeedbackCard from "@/components/FeedbackCard";
 import LikedOverlay from "@/components/LikedOverlay";
 import ShareProfileModal from "@/components/ShareProfileModal";
+import TutorialModal from "@/components/TutorialModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 
 type Feedback = {
   _id: string;
@@ -30,6 +31,16 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [username, setUsername] = useState<string>("");
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  const checkTutorial = async () => {
+    const flag = await AsyncStorage.getItem("showTutorial");
+    if (flag === "true") {
+      setShowTutorial(true);
+      await AsyncStorage.removeItem("showTutorial");
+    }
+  };
+
 
 
   useEffect(() => {
@@ -37,6 +48,9 @@ export default function HomeScreen() {
       fetchFeedbacks();
       fetchLikedFeedbacks();
       fetchUsername();
+      checkTutorial();
+
+
     } else if (isLoaded && !isSignedIn) {
       setLoading(false);
     }
@@ -144,6 +158,11 @@ export default function HomeScreen() {
         visible={showShareModal}
         username={username}
         onClose={() => setShowShareModal(false)}
+      />
+
+      <TutorialModal
+        visible={showTutorial}
+        onClose={() => setShowTutorial(false)}
       />
 
       {/* Feed with pull to refresh */}

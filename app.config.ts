@@ -16,9 +16,6 @@ const config: ExpoConfig = {
     bundleIdentifier: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    googleServicesFile: isDevelopment
-      ? "./GoogleService-Info-Dev.plist"
-      : "./GoogleService-Info.plist",
     associatedDomains: ["applinks:feedbackapp-drsj.onrender.com"],
   },
 

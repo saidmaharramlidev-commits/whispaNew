@@ -109,19 +109,6 @@ export default function WhispaActionModal({ visible, feedback, onClose, onDelete
                         </Text>
                     </TouchableOpacity>
 
-                    {/* Report */}
-                    <TouchableOpacity
-                        onPress={onReport}
-                        className="flex-row items-center gap-4 px-4 py-4 bg-[#1a1a1a] rounded-2xl border border-[#282828]"
-                    >
-                        <View className="w-9 h-9 rounded-full bg-[#282828] items-center justify-center">
-                            <Ionicons name="flag-outline" size={18} color="#b3b3b3" />
-                        </View>
-                        <Text className="text-white font-semibold text-base">
-                            {i18n.t("reportWhispa")}
-                        </Text>
-                    </TouchableOpacity>
-
                     {/* Cancel */}
                     <TouchableOpacity
                         onPress={onClose}

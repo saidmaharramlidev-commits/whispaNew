@@ -154,6 +154,30 @@ const i18n = new I18n({
         scanToWhispa: "Scan to send an anonymous whispa",
         shareLink: "Share Link",
         sharingWhispa: "Preparing your whispa...",
+
+
+
+        // Tutorial Modal
+        step: "Step",
+        getStarted: "Get Started",
+        next: "Next",
+        skip: "Skip",
+        tutorialStep1Title: "Receive Whispas",
+        tutorialStep1Desc: "People send you anonymous messages called Whispas. Share your profile and let the world speak freely.",
+        tutorialStep2Title: "Review & Like",
+        tutorialStep2Desc: "Swipe through your Whispas on the home screen. Like the ones you love, delete the ones you don't.",
+        tutorialStep3Title: "Share Your Profile",
+        tutorialStep3Desc: "Share your profile link or QR code with friends. The more you share, the more Whispas you receive.",
+
+
+        usernameTaken: "This username is already taken",
+        usernameTooShort: "Username must be at least 2 characters",
+        usernameTooLong: "Username cannot exceed 30 characters",
+        usernameInvalidChars: "Username can only contain letters, numbers, _ and -",
+        emailTaken: "This email is already registered. Try signing in instead.",
+        emailInvalid: "Please enter a valid email address",
+        passwordTooShort: "Password must be at least 8 characters",
+        passwordTooWeak: "Password must contain at least one letter and one number",
     },
 
     az: {
@@ -310,6 +334,27 @@ const i18n = new I18n({
         scanToWhispa: "Anonim whispa göndərmək üçün skan edin",
         shareLink: "Linki Paylaş",
         sharingWhispa: "Whispa hazırlanır...",
+
+        // Tutorial Modal
+        step: "Addım",
+        getStarted: "Başla",
+        next: "İrəli",
+        skip: "Keç",
+        tutorialStep1Title: "Whispa Al",
+        tutorialStep1Desc: "İnsanlar sizə 'Whispa' adlı anonim mesajlar göndərir. Profilinizi paylaşın və dünya sərbəst danışsın.",
+        tutorialStep2Title: "Bax və Bəyən",
+        tutorialStep2Desc: "Whispaları ana ekranda nəzərdən keçirin. Sevdiklərinizi bəyənin, sevmədiklərinizi silin.",
+        tutorialStep3Title: "Profilini Paylaş",
+        tutorialStep3Desc: "Profil linkini və ya QR kodunu dostlarınla paylaş. Nə qədər çox paylaşsan, bir o qədər çox Whispa alarsan.",
+
+        usernameTaken: "Bu istifadəçi adı artıq mövcuddur",
+        usernameTooShort: "İstifadəçi adı ən az 2 simvol olmalıdır",
+        usernameTooLong: "İstifadəçi adı 30 simvoldan çox ola bilməz",
+        usernameInvalidChars: "İstifadəçi adı yalnız hərf, rəqəm, _ və - içərə bilər",
+        emailTaken: "Bu e-poçt artıq qeydiyyatdadır. Daxil olmağa çalışın.",
+        emailInvalid: "Düzgün e-poçt ünvanı daxil edin",
+        passwordTooShort: "Şifrə ən az 8 simvol olmalıdır",
+        passwordTooWeak: "Şifrədə ən az bir hərf və bir rəqəm olmalıdır",
 
 
     },
