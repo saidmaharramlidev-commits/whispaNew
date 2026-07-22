@@ -8,7 +8,7 @@ const config: ExpoConfig = {
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/Logo.png",
-  scheme: "whispame",  // ← changed from "whispa" to "whispame" for consistency
+  scheme: "whispame",
   userInterfaceStyle: "automatic",
 
   ios: {
