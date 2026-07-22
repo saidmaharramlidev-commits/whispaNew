@@ -40,7 +40,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
                 if (token) {
                     setExpoPushToken(token);
                 } else {
-                    setPermissionDenied(true); // ← null means denied
+                    setPermissionDenied(true);
                 }
             },
             (error) => setError(error),
@@ -58,14 +58,31 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         const responseListener = Notifications.addNotificationResponseReceivedListener(
             (response) => {
                 const title = response.notification.request.content.title;
+                // small delay to ensure router is ready
+                setTimeout(() => {
+                    if (title === "New Follower 🎉") {
+                        router.push("/(tabs)/profile" as any);
+                    }
+                    if (title === "New Whispa 💬") {
+                        router.push("/(tabs)" as any);
+                    }
+                }, 500);
+            }
+        );
+
+        // handle notification that opened app from killed state
+        Notifications.getLastNotificationResponseAsync().then((response) => {
+            if (!response) return;
+            const title = response.notification.request.content.title;
+            setTimeout(() => {
                 if (title === "New Follower 🎉") {
                     router.push("/(tabs)/profile" as any);
                 }
                 if (title === "New Whispa 💬") {
                     router.push("/(tabs)" as any);
                 }
-            }
-        );
+            }, 1000); // longer delay for cold start
+        });
 
         return () => {
             notificationListener.remove();

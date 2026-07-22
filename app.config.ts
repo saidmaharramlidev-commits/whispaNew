@@ -69,7 +69,10 @@ const config: ExpoConfig = {
       {
         image: "./assets/images/Logo.png",
         imageWidth: 200,
+        icon: './assets/images/whispame_notification_logo.png',
+        color: "#1DB954",
         resizeMode: "contain",
+        defaultChannel: "default",
         backgroundColor: "#000000",
         dark: {
           backgroundColor: "#000000"

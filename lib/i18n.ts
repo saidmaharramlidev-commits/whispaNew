@@ -178,6 +178,9 @@ const i18n = new I18n({
         emailInvalid: "Please enter a valid email address",
         passwordTooShort: "Password must be at least 8 characters",
         passwordTooWeak: "Password must contain at least one letter and one number",
+
+        swipeDelete: "swipe to delete",
+        swipeLike: "swipe to like",
     },
 
     az: {
@@ -355,6 +358,9 @@ const i18n = new I18n({
         emailInvalid: "Düzgün e-poçt ünvanı daxil edin",
         passwordTooShort: "Şifrə ən az 8 simvol olmalıdır",
         passwordTooWeak: "Şifrədə ən az bir hərf və bir rəqəm olmalıdır",
+
+        swipeDelete: "silmək üçün sürüşdür",
+        swipeLike: "bəyənmək üçün sürüşdür",
 
 
     },

@@ -9,6 +9,8 @@ import * as Linking from 'expo-linking';
 import * as Notifications from "expo-notifications";
 import { Slot, router, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 
 
@@ -149,12 +151,14 @@ function InitialLayout() {
 
 export default function RootLayout() {
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <NotificationProvider>
-        <LanguageProvider>
-          <InitialLayout />
-        </LanguageProvider>
-      </NotificationProvider>
-    </ClerkProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <NotificationProvider>
+          <LanguageProvider>
+            <InitialLayout />
+          </LanguageProvider>
+        </NotificationProvider>
+      </ClerkProvider>
+    </GestureHandlerRootView>
   )
 }

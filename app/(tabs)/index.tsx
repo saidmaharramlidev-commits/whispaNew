@@ -1,7 +1,6 @@
-import ActionButtons from "@/components/ActionButtons";
-import FeedbackCard from "@/components/FeedbackCard";
 import LikedOverlay from "@/components/LikedOverlay";
 import ShareProfileModal from "@/components/ShareProfileModal";
+import SwipeableFeedbackCard from "@/components/SwipeableFeedbackCard"; // ← new
 import TutorialModal from "@/components/TutorialModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
@@ -41,16 +40,12 @@ export default function HomeScreen() {
     }
   };
 
-
-
   useEffect(() => {
     if (isLoaded && isSignedIn) {
       fetchFeedbacks();
       fetchLikedFeedbacks();
       fetchUsername();
       checkTutorial();
-
-
     } else if (isLoaded && !isSignedIn) {
       setLoading(false);
     }
@@ -68,6 +63,7 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
+
   const fetchUsername = async () => {
     try {
       const data = await api.getMe();
@@ -114,7 +110,6 @@ export default function HomeScreen() {
     }
   };
 
-
   const currentFeedback = feedbacks[currentIndex];
   const isFinished = currentIndex >= feedbacks.length;
 
@@ -132,7 +127,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 py-4">
         <TouchableOpacity
-          onPress={() => setShowShareModal(true)}  // ← was handleShareProfile
+          onPress={() => setShowShareModal(true)}
           className="bg-[#1a1a1a] p-2 rounded-full border border-[#282828]"
         >
           <Ionicons name="share-outline" size={20} color="#b3b3b3" />
@@ -165,7 +160,7 @@ export default function HomeScreen() {
         onClose={() => setShowTutorial(false)}
       />
 
-      {/* Feed with pull to refresh */}
+      {/* Feed */}
       <FlatList
         data={[]}
         renderItem={null}
@@ -191,8 +186,25 @@ export default function HomeScreen() {
               <Text className="text-[#b3b3b3] text-sm mb-6">
                 {currentIndex + 1} / {feedbacks.length}
               </Text>
-              <FeedbackCard text={currentFeedback.text} />
-              <ActionButtons onLike={handleLike} onDelete={handleDelete} />
+
+              {/* Swipeable card */}
+              <SwipeableFeedbackCard
+                text={currentFeedback.text}
+                onLike={handleLike}
+                onDelete={handleDelete}
+              />
+
+              {/* Swipe hint */}
+              <View className="flex-row justify-between items-center px-4 mt-6 w-full">
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-red-400 text-sm">←</Text>
+                  <Text className="text-[#555] text-xs">{i18n.t("swipeDelete")}</Text>
+                </View>
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-[#555] text-xs">{i18n.t("swipeLike")}</Text>
+                  <Text className="text-[#1DB954] text-sm">→</Text>
+                </View>
+              </View>
             </View>
           )
         }
