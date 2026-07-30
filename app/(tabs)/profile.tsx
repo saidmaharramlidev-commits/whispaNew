@@ -1,14 +1,15 @@
 import FollowListModal from "@/components/FollowListModal";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
-import { useAuth } from "@clerk/expo";
+import { useAuth, useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Modal, Pressable, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 type UserProfile = {
     _id: string;
@@ -19,6 +20,7 @@ type UserProfile = {
     following: any[];
     isAcceptingFeedback: boolean;
     followersOnly: boolean;
+    isPremium: boolean;
 };
 
 type FollowUser = {
@@ -31,6 +33,7 @@ export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
     const { isLoaded, isSignedIn } = useAuth();
     const api = useApi();
+    const { user: clerkUser } = useUser();
 
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -41,6 +44,9 @@ export default function ProfileScreen() {
     const [followers, setFollowers] = useState<FollowUser[]>([]);
     const [following, setFollowing] = useState<FollowUser[]>([]);
     const [followLoading, setFollowLoading] = useState(false);
+
+    const [streak, setStreak] = useState({ currentStreak: 0, longestStreak: 0 });
+    const [showStreakTip, setShowStreakTip] = useState(false);
 
     useEffect(() => {
         if (isLoaded && isSignedIn) {
@@ -56,6 +62,7 @@ export default function ProfileScreen() {
             const data = await api.getMe();
             setUser(data.data);
             setAvatarUrl(data.data.avatarUrl || "");
+            await fetchStreak(); // ← add this
         } catch (err) {
             console.error("Failed to load profile:", err);
         } finally {
@@ -63,6 +70,18 @@ export default function ProfileScreen() {
             setRefreshing(false);
         }
     };
+
+    const fetchStreak = async () => {
+        try {
+            if (!clerkUser?.id) return;
+            const data = await api.getStreak(clerkUser.id);
+            setStreak(data.data);
+        } catch (err) {
+            console.error("Failed to fetch streak:", err);
+        }
+    };
+
+
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -257,6 +276,61 @@ export default function ProfileScreen() {
                                 </Text>
                             ) : null}
                         </View>
+
+
+                        {streak.currentStreak > 0 ? (
+                            <Pressable
+                                onPress={() => setShowStreakTip(true)}
+                                onLongPress={() => setShowStreakTip(true)}
+                                className="flex-row items-center gap-2 mb-5 bg-[#1DB954] border border-[#ffffff] py-2 px-5 rounded-full self-center"
+                            >
+                                <Text style={{ fontSize: 18 }}>🔥</Text>
+                                <Text className="text-white font-bold text-sm">{streak.currentStreak}</Text>
+                                <Text className="text-white text-xs">{i18n.t("dayStreak")}</Text>
+                            </Pressable>
+                        ) : (
+                            <Pressable
+                                onPress={() => setShowStreakTip(true)}
+                                onLongPress={() => setShowStreakTip(true)}
+                                className="flex-row items-center gap-2 mb-5 bg-[#1a1a1a] border border-[#282828] py-2 px-5 rounded-full self-center"
+                            >
+                                <Text style={{ fontSize: 18 }}>🔥</Text>
+                                <Text className="text-[#555] text-xs">{i18n.t("noStreak")}</Text>
+                            </Pressable>
+                        )}
+
+                        {/* Streak tip modal */}
+                        <Modal
+                            visible={showStreakTip}
+                            transparent
+                            animationType="fade"
+                            onRequestClose={() => setShowStreakTip(false)}
+                        >
+                            <Pressable
+                                className="flex-1 bg-black/70 justify-center items-center px-8"
+                                onPress={() => setShowStreakTip(false)}
+                            >
+                                <View className="bg-[#111] border border-[#282828] rounded-3xl p-6 w-full">
+                                    <Text className="text-4xl text-center mb-4">🔥</Text>
+                                    <Text className="text-white text-xl font-bold text-center mb-2">
+                                        {i18n.t("streakTitle")}
+                                    </Text>
+                                    <Text className="text-[#888] text-sm text-center leading-6 mb-4">
+                                        {i18n.t("streakTip")}
+                                    </Text>
+                                    <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-4 py-3 mb-4">
+                                        <Text className="text-[#555] text-xs mb-1">{i18n.t("longestStreak")}</Text>
+                                        <Text className="text-white font-bold text-lg">🔥 {streak.longestStreak} {i18n.t("days")}</Text>
+                                    </View>
+                                    <Pressable
+                                        onPress={() => setShowStreakTip(false)}
+                                        className="bg-[#1DB954] rounded-full py-3 items-center"
+                                    >
+                                        <Text className="text-black font-bold">{i18n.t("gotIt")}</Text>
+                                    </Pressable>
+                                </View>
+                            </Pressable>
+                        </Modal>
 
                         {/* Stats */}
                         <View className="flex-row justify-center gap-10 mb-6">

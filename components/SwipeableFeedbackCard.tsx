@@ -1,7 +1,10 @@
+import VoicePlayer from "@/components/VoicePlayer";
 import i18n from "@/lib/i18n";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { Dimensions, Text, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, Pressable } from "react-native-gesture-handler";
+
 import Animated, {
     interpolate,
     runOnJS,
@@ -15,16 +18,22 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 120;
 
 type Props = {
-    text: string;
+    text: string | null;
+    senderUsername?: string | null;
     onLike: () => void;
     onDelete: () => void;
+    onReply: () => void;
+    isPremium: boolean;
+    canReply: boolean;
+    audioUrl?: string | null;
+    type?: "text" | "voice";
 };
 
-export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props) {
+
+export default function SwipeableFeedbackCard({ text, senderUsername, onLike, onDelete, onReply, isPremium, canReply, type, audioUrl }: Props) {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
 
-    // reset position when text changes (new card)
     useEffect(() => {
         translateX.value = 0;
         translateY.value = 0;
@@ -33,19 +42,16 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
     const gesture = Gesture.Pan()
         .onUpdate((e) => {
             translateX.value = e.translationX;
-            translateY.value = e.translationY * 0.2; // slight vertical movement
+            translateY.value = e.translationY * 0.2;
         })
         .onEnd((e) => {
             if (e.translationX > SWIPE_THRESHOLD) {
-                // swipe right → like
                 translateX.value = withTiming(SCREEN_WIDTH * 1.5, { duration: 300 });
                 runOnJS(onLike)();
             } else if (e.translationX < -SWIPE_THRESHOLD) {
-                // swipe left → delete
                 translateX.value = withTiming(-SCREEN_WIDTH * 1.5, { duration: 300 });
                 runOnJS(onDelete)();
             } else {
-                // snap back
                 translateX.value = withSpring(0);
                 translateY.value = withSpring(0);
             }
@@ -57,7 +63,6 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
             [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
             [-20, 0, 20]
         );
-
         return {
             transform: [
                 { translateX: translateX.value },
@@ -67,7 +72,6 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
         };
     });
 
-    // green overlay opacity when swiping right
     const likeOverlayStyle = useAnimatedStyle(() => {
         const opacity = interpolate(
             translateX.value,
@@ -78,7 +82,6 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
         return { opacity };
     });
 
-    // red overlay opacity when swiping left
     const deleteOverlayStyle = useAnimatedStyle(() => {
         const opacity = interpolate(
             translateX.value,
@@ -96,21 +99,18 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
                     className="w-full rounded-3xl border border-[#1DB954]/20 bg-[#0a0a0a]"
                     style={{ minHeight: 280 }}
                 >
-                    {/* Like overlay — green */}
+                    {/* Like overlay */}
                     <Animated.View
-                        style={[
-                            {
-                                position: "absolute",
-                                top: 0, left: 0, right: 0, bottom: 0,
-                                borderRadius: 24,
-                                backgroundColor: "#1DB954",
-                                opacity: 0,
-                                zIndex: 10,
-                                justifyContent: "center",
-                                alignItems: "center",
-                            },
-                            likeOverlayStyle,
-                        ]}
+                        style={[{
+                            position: "absolute",
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            borderRadius: 24,
+                            backgroundColor: "#1DB954",
+                            opacity: 0,
+                            zIndex: 10,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }, likeOverlayStyle]}
                         pointerEvents="none"
                     >
                         <Text style={{ fontSize: 60 }}>❤️</Text>
@@ -119,21 +119,18 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
                         </Text>
                     </Animated.View>
 
-                    {/* Delete overlay — red */}
+                    {/* Delete overlay */}
                     <Animated.View
-                        style={[
-                            {
-                                position: "absolute",
-                                top: 0, left: 0, right: 0, bottom: 0,
-                                borderRadius: 24,
-                                backgroundColor: "#ef4444",
-                                opacity: 0,
-                                zIndex: 10,
-                                justifyContent: "center",
-                                alignItems: "center",
-                            },
-                            deleteOverlayStyle,
-                        ]}
+                        style={[{
+                            position: "absolute",
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            borderRadius: 24,
+                            backgroundColor: "#ef4444",
+                            opacity: 0,
+                            zIndex: 10,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }, deleteOverlayStyle]}
                         pointerEvents="none"
                     >
                         <Text style={{ fontSize: 60 }}>🗑️</Text>
@@ -142,26 +139,69 @@ export default function SwipeableFeedbackCard({ text, onLike, onDelete }: Props)
                         </Text>
                     </Animated.View>
 
-                    {/* Text content */}
+                    {/* Text or Voice content */}
                     <View className="px-8 py-6 flex-1 justify-center" style={{ minHeight: 180 }}>
-                        <Text className="text-white text-xl text-center leading-9 tracking-wide">
-                            {text}
-                        </Text>
+                        {type === "voice" && audioUrl ? (
+                            <VoicePlayer audioUrl={audioUrl} />
+                        ) : (
+                            <Text className="text-white text-xl text-center leading-9 tracking-wide">
+                                {text}
+                            </Text>
+                        )}
                     </View>
 
                     {/* Bottom */}
                     <View className="flex-row justify-between items-center px-8 pb-8">
-                        <View className="flex-row items-center gap-2">
-                            <View className="w-2 h-2 rounded-full bg-[#1DB954]" />
-                            <Text className="text-[#1DB954] text-xs tracking-widest uppercase font-semibold">
-                                {i18n.t("appName").toLowerCase()}
-                            </Text>
-                        </View>
-                        <View className="bg-[#1a1a1a] border border-[#282828] px-3 py-1 rounded-full">
-                            <Text className="text-[#555] text-xs tracking-wider uppercase">
-                                {i18n.t("anonymous")}
-                            </Text>
-                        </View>
+
+
+                        {/* Left — reply button where brand name was */}
+                        {canReply ? (
+                            <Pressable
+                                onPress={onReply}
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 6,
+                                    backgroundColor: isPremium ? "#1DB954" + "20" : "#1a1a1a",
+                                    borderWidth: 1,
+                                    borderColor: isPremium ? "#1DB954" + "40" : "#282828",
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 8,
+                                    borderRadius: 999,
+                                }}
+                            >
+                                <Ionicons
+                                    name="return-down-forward-outline"
+                                    size={14}
+                                    color={isPremium ? "#1DB954" : "#555"}
+                                />
+                                <Text style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: isPremium ? "#1DB954" : "#555",
+                                }}>
+                                    {i18n.t("reply")}
+                                </Text>
+                                {!isPremium && (
+                                    <Text style={{ fontSize: 11 }}>💎</Text>
+                                )}
+                            </Pressable>
+                        ) : (
+                            // empty placeholder to keep layout balanced
+                            <View />
+                        )}
+
+                        {senderUsername ? (
+                            <View className="bg-[#1a1a1a] border border-[#1DB954]/30 px-3 py-1 rounded-full">
+                                <Text className="text-[#1DB954] text-xs font-semibold">@{senderUsername}</Text>
+                            </View>
+                        ) : (
+                            <View className="bg-[#1a1a1a] border border-[#282828] px-3 py-1 rounded-full">
+                                <Text className="text-[#555] text-xs tracking-wider uppercase">
+                                    {i18n.t("anonymous")}
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </View>
             </Animated.View>

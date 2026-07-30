@@ -4,8 +4,13 @@ import { useEffect, useRef } from "react";
 import { Animated, Modal, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type Feedback = { _id: string; text: string };
-
+type Feedback = {
+    _id: string;
+    text: string | null;
+    senderUsername?: string | null;
+    audioUrl?: string | null;
+    type?: "text" | "voice";
+};
 type Props = {
     visible: boolean;
     feedback: Feedback | null;

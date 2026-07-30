@@ -10,7 +10,7 @@ const i18n = new I18n({
 
         // Auth - Sign In
         signIn: "Sign in",
-        signInWelcome: "Welcome Back.",
+        signInWelcome: "Welcome back. Curious what's waiting?",
         signInVerifyIdentity: "verify your identity",
         email: "Email",
         emailPlaceholder: "you@example.com",
@@ -23,7 +23,7 @@ const i18n = new I18n({
         invalidEmailOrPassword: "Invalid email or password",
 
         // Auth - Sign Up
-        createAccount: "Create Account",
+        createAccount: "See what people are too afraid to say out loud.",
         username: "Username",
         usernamePlaceholder: "Create a username",
         creatingAccount: "Creating account...",
@@ -181,6 +181,42 @@ const i18n = new I18n({
 
         swipeDelete: "swipe to delete",
         swipeLike: "swipe to like",
+
+        showMyUsername: "Show my username",
+        showMyUsernameDesc: "Sender will be visible to receiver",
+
+        premiumFeature: "This is a premium feature. Upgrade to WhispaMe Premium to unlock it.",
+
+        reply: "Reply",
+
+        replyToWhispa: "Reply to Whispa",
+        replyingTo: "Replying to:",
+        replyPlaceholder: "Write your reply...",
+        replySent: "Reply sent!",
+
+
+        inbox: "Inbox",
+        noRepliesYet: "No replies yet",
+        noRepliesDesc: "When someone replies to your whispa, it will appear here.",
+        repliedToYourWhispa: "replied to your whispa",
+        yourWhispa: "Your whispa:",
+
+        dayStreak: "day streak",
+        streakTitle: "Whispa Streak",
+        streakTip: "Send at least one whispa every day to keep your streak alive. Miss a day and it resets to zero!",
+        longestStreak: "Your longest streak:",
+        days: "days",
+        gotIt: "Got it!",
+
+        noStreak: "Start a streak!",
+        dailyLimitReached: "You've reached your 10 whispa daily limit. Upgrade to Premium for unlimited whispas 💎",
+
+        dailyLimit: "Daily whispas:",
+
+        sendVoiceWhispa: "Send Voice Whispa",
+        uploadingAudio: "Uploading audio...",
+        voicePreview: "Preview your voice whispa:",
+        recordAgain: "Record again",
     },
 
     az: {
@@ -192,7 +228,7 @@ const i18n = new I18n({
 
         // Auth - Sign In
         signIn: "Daxil ol",
-        signInWelcome: "Xoş gəldiniz.",
+        signInWelcome: "Xoş gəldin. Görəsən səni nə gözləyir?",
         signInVerifyIdentity: "kimliyinizi təsdiqləyin",
         email: "E-poçt",
         emailPlaceholder: "siz@misal.com",
@@ -205,7 +241,7 @@ const i18n = new I18n({
         invalidEmailOrPassword: "E-poçt və ya şifrə yanlışdır",
 
         // Auth - Sign Up
-        createAccount: "Hesab Yarat",
+        createAccount: "Sənin haqqında deməyə cəsarət etmədiklərini öyrən..",
         username: "İstifadəçi adı",
         usernamePlaceholder: "İstifadəçi adı yaradın",
         creatingAccount: "Hesab yaradılır...",
@@ -361,6 +397,42 @@ const i18n = new I18n({
 
         swipeDelete: "silmək üçün sürüşdür",
         swipeLike: "bəyənmək üçün sürüşdür",
+
+
+        showMyUsername: "İstifadəçi adımı göstər",
+        showMyUsernameDesc: "Göndərən qəbul edənə görünəcək",
+
+        premiumFeature: "Bu premium xüsusiyyətdir. Kilidi açmaq üçün WhispaMe Premium-a keçin.",
+        reply: "Cavabla",
+
+        replyToWhispa: "Whispaya Cavab Ver",
+        replyingTo: "Cavab verilir:",
+        replyPlaceholder: "Cavabınızı yazın...",
+        replySent: "Cavab göndərildi!",
+
+
+        inbox: "Gələnlər",
+        noRepliesYet: "Hələ cavab yoxdur",
+        noRepliesDesc: "Kimsə whispanıza cavab verdikdə burada görünəcək.",
+        repliedToYourWhispa: "whispanıza cavab verdi",
+        yourWhispa: "Sizin whispanız:",
+
+        dayStreak: "günlük seriya",
+        streakTitle: "Whispa Seriyası",
+        streakTip: "Serianızı qorumaq üçün hər gün ən az bir whispa göndərin. Bir gün buraxsanız sıfırlanır!",
+        longestStreak: "Ən uzun serianız:",
+        days: "gün",
+        gotIt: "Anladım!",
+
+        noStreak: "Seriya başlat!",
+        dailyLimitReached: "Gündəlik 10 whispa limitinə çatdınız. Limitsiz whispa üçün Premium-a keçin 💎",
+
+        dailyLimit: "Gündəlik whispalar:",
+
+        sendVoiceWhispa: "Səsli Whispa Göndər",
+        uploadingAudio: "Səs yüklənir...",
+        voicePreview: "Səsli whispanıza baxın:",
+        recordAgain: "Yenidən qeyd et",
 
 
     },

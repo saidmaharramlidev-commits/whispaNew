@@ -1,7 +1,6 @@
 import i18n from "@/lib/i18n";
 import { useAuth, useSignUp } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -172,7 +171,6 @@ export default function Page() {
             }
 
             await signUp.finalize();
-            await AsyncStorage.setItem("showTutorial", "true");
             router.replace("/(tabs)" as any);
         } catch (err: any) {
             setCodeError(

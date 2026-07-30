@@ -3,9 +3,10 @@ import { Text, View } from "react-native";
 
 type Props = {
     text: string;
+    senderUsername?: string | null;
 };
 
-export default function FeedbackCard({ text }: Props) {
+export default function FeedbackCard({ text, senderUsername }: Props) {
     return (
         <View className="w-full rounded-3xl border border-[#1DB954]/20 bg-[#0a0a0a]" style={{ minHeight: 280 }}>
 
@@ -24,13 +25,18 @@ export default function FeedbackCard({ text }: Props) {
                         {i18n.t("appName").toLowerCase()}
                     </Text>
                 </View>
-                <View className="bg-[#1a1a1a] border border-[#282828] px-3 py-1 rounded-full">
-                    <Text className="text-[#555] text-xs tracking-wider uppercase">
-                        {i18n.t("anonymous")}
-                    </Text>
-                </View>
+                {senderUsername ? (
+                    <View className="bg-[#1a1a1a] border border-[#1DB954]/30 px-3 py-1 rounded-full">
+                        <Text className="text-[#1DB954] text-xs font-semibold">@{senderUsername}</Text>
+                    </View>
+                ) : (
+                    <View className="bg-[#1a1a1a] border border-[#282828] px-3 py-1 rounded-full">
+                        <Text className="text-[#555] text-xs tracking-wider uppercase">
+                            {i18n.t("anonymous")}
+                        </Text>
+                    </View>
+                )}
             </View>
-
         </View>
     );
 }

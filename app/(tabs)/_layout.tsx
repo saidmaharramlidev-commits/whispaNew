@@ -21,7 +21,7 @@ export default function TabsLayout() {
 
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: "#fff",
+                tabBarActiveTintColor: "#1DB954",
                 tabBarInactiveTintColor: "#999",
                 tabBarStyle: {
                     backgroundColor: "#1e1e1e",
@@ -58,6 +58,19 @@ export default function TabsLayout() {
                     ),
                 }}
             />
+
+            <Tabs.Screen
+                name="inbox"
+                options={{
+                    title: i18n.t("inbox"),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="mail-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+
+
+
             <Tabs.Screen
                 name="profile"
                 options={{

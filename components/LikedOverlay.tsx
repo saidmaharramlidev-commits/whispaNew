@@ -1,3 +1,4 @@
+import VoicePlayer from "@/components/VoicePlayer";
 import WhispaActionModal from "@/components/WhispaActionModal";
 import WhispaShareModal from "@/components/WhispaShareModal";
 import { useApi } from "@/lib/api";
@@ -8,8 +9,19 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
-type Feedback = { _id: string; text: string };
-type Props = { likedFeedbacks: Feedback[]; onClose: () => void; onUnlike: (id: string) => void };
+type Feedback = {
+    _id: string;
+    text: string | null;
+    senderUsername?: string | null;
+    audioUrl?: string | null;
+    type?: "text" | "voice";
+};
+
+type Props = {
+    likedFeedbacks: Feedback[];
+    onClose: () => void;
+    onUnlike: (id: string) => void
+};
 
 export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Props) {
     const insets = useSafeAreaInsets();
@@ -43,7 +55,7 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
     const handleShare = () => {
         closeActionModal();
         if (selectedFeedback) {
-            setShareText(selectedFeedback.text);
+            setShareText(selectedFeedback.text ?? '');
             setShowShareModal(true);
         }
     };
@@ -86,19 +98,22 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                     contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
                     renderItem={({ item }) => (
                         <View className="bg-[#111] rounded-2xl p-5 mb-3 border border-[#282828]">
+                            {/* Top row — text + dots */}
                             <View className="flex-row items-start justify-between gap-3">
-                                {/* Whispa text — flex-1 ensures it never pushes the dots */}
-                                <Text
-                                    className="text-white leading-6 flex-1"
-                                    style={{
-                                        fontSize: item.text.length > 120 ? 14 : item.text.length > 60 ? 15 : 16,
-                                        lineHeight: item.text.length > 120 ? 22 : 24,
-                                    }}
-                                >
-                                    {item.text}
-                                </Text>
+                                {item.type === "voice" && item.audioUrl ? (
+                                    <VoicePlayer audioUrl={item.audioUrl} />
+                                ) : (
+                                    <Text
+                                        className="text-white leading-6 flex-1"
+                                        style={{
+                                            fontSize: (item.text?.length || 0) > 120 ? 14 : (item.text?.length || 0) > 60 ? 15 : 16,
+                                            lineHeight: (item.text?.length || 0) > 120 ? 22 : 24,
+                                        }}
+                                    >
+                                        {item.text}
+                                    </Text>
+                                )}
 
-                                {/* Dots — always pinned to right, never pushed */}
                                 <TouchableOpacity
                                     onPress={() => openActionModal(item)}
                                     className="bg-[#1a1a1a] rounded-full p-2 border border-[#282828]"
@@ -107,6 +122,19 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                                 >
                                     <Ionicons name="ellipsis-horizontal" size={16} color="#888" />
                                 </TouchableOpacity>
+                            </View>
+
+                            {/* Bottom row — sender username */}
+                            <View className="mt-3">
+                                {item.senderUsername ? (
+                                    <View className="bg-[#1a1a1a] border border-[#1DB954]/30 px-2 py-0.5 rounded-full self-start">
+                                        <Text className="text-[#1DB954] text-xs font-semibold">@{item.senderUsername}</Text>
+                                    </View>
+                                ) : (
+                                    <View className="bg-[#1a1a1a] border border-[#282828] px-2 py-0.5 rounded-full self-start">
+                                        <Text className="text-[#555] text-xs">{i18n.t("anonymous")}</Text>
+                                    </View>
+                                )}
                             </View>
                         </View>
                     )}

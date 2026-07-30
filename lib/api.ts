@@ -58,11 +58,21 @@ export const useApi = () => {
     // ── Feedback ──────────────────────────────────
     const getMyFeedbacks = () => request("/feedbacks/me");
     const getLikedFeedbacks = () => request("/feedbacks/liked");
-    const sendFeedback = (username: string, text: string) =>
+
+
+    const sendFeedback = (
+        username: string,
+        text: string | null,
+        senderUsername?: string | null,
+        audioUrl?: string | null,
+        type?: "text" | "voice"
+    ) =>
         request(`/feedbacks/${username}`, {
             method: "POST",
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, senderUsername, audioUrl, type }),
         });
+
+
     const deleteFeedback = (id: string) =>
         request(`/feedbacks/${id}`, { method: "DELETE" });
 
@@ -71,6 +81,25 @@ export const useApi = () => {
         request(`/feedbacks/${id}/like`, {
             method: "PATCH",
         });
+
+
+    // ── Replies ───────────────────────────────────
+    const sendReply = (feedbackId: string, text: string) =>
+        request(`/replies/${feedbackId}/reply`, {
+            method: "POST",
+            body: JSON.stringify({ text }),
+        });
+
+    const getMyReplies = () => request("/replies/inbox");
+
+    const deleteReply = (replyId: string) =>
+        request(`/replies/${replyId}`, { method: "DELETE" });
+
+    // ── Streaks ───────────────────────────────────
+    const getStreak = (clerkId: string) =>
+        request(`/streaks/${clerkId}`);
+
+    const getDailyCount = () => request("/feedbacks/daily-count");
 
     return {
         getMe,
@@ -85,6 +114,11 @@ export const useApi = () => {
         sendFeedback,
         deleteFeedback,
         toggleLikeFeedback,
-        removeFollower
+        removeFollower,
+        sendReply,
+        getMyReplies,
+        deleteReply,
+        getStreak,
+        getDailyCount
     };
 };

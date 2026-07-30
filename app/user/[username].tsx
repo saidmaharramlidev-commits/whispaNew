@@ -1,10 +1,14 @@
+import VoicePlayer from "@/components/VoicePlayer";
+import VoiceRecorder from "@/components/VoiceRecorder";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { containsForbiddenWord } from "@/lib/wordFilter";
 import { useUser } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system/legacy";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Modal, Pressable, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type UserProfile = {
@@ -37,10 +41,13 @@ export default function UserProfileScreen() {
     const [feedbackSent, setFeedbackSent] = useState(false);
     const [feedbackError, setFeedbackError] = useState("");
     const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+    const [showUsername, setShowUsername] = useState(false);
+    const [currentUserIsPremium, setCurrentUserIsPremium] = useState(false);
+    const [dailyCount, setDailyCount] = useState(0);
+    const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+    const [audioUri, setAudioUri] = useState<string | null>(null);
+    const [audioUploading, setAudioUploading] = useState(false);
 
-    useEffect(() => {
-        fetchUser();
-    }, [username]);
 
     const fetchUser = async () => {
         try {
@@ -55,6 +62,32 @@ export default function UserProfileScreen() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchUser();
+        fetchCurrentUser(); // ← add this
+        fetchDailyCount(); // ← add this
+    }, [username]);
+
+    const fetchCurrentUser = async () => {
+        try {
+            const meData = await api.getMe();
+            setCurrentUserIsPremium(meData.data.isPremium);
+        } catch (err) {
+            console.error("Failed to fetch current user:", err);
+        }
+    };
+
+    const fetchDailyCount = async () => {
+        try {
+            const data = await api.getDailyCount();
+            setDailyCount(data.data.count);
+        } catch (err) {
+            console.error("Failed to fetch daily count:", err);
+        }
+    };
+
+
 
     const handleToggleFollow = async () => {
         if (!clerkUser || !user) return;
@@ -81,7 +114,6 @@ export default function UserProfileScreen() {
             return;
         }
 
-        // profanity check
         if (containsForbiddenWord(feedbackText)) {
             setFeedbackError(i18n.t("forbiddenWord"));
             return;
@@ -91,15 +123,92 @@ export default function UserProfileScreen() {
 
         try {
             setFeedbackLoading(true);
-            await api.sendFeedback(user!.username, feedbackText);
+            const clerkUsername = clerkUser?.username || null;
+            await api.sendFeedback(
+                user!.username,
+                feedbackText,
+                showUsername ? clerkUsername : null
+            );
             setFeedbackSent(true);
             setFeedbackText("");
+            setDailyCount(prev => prev + 1);
+            setTimeout(() => {
+                setFeedbackModalVisible(false);
+                setFeedbackSent(false);
+                setShowUsername(false);
+            }, 1500);
+        } catch (err: any) {
+            const message = err?.message || "";
+            if (message.includes("Daily limit reached")) {
+                setFeedbackError(i18n.t("dailyLimitReached"));
+            } else {
+                console.error("Failed to send feedback:", err);
+            }
+        } finally {
+            setFeedbackLoading(false);
+        }
+    };
+
+    const uploadAudio = async (uri: string): Promise<string | null> => {
+        try {
+            setAudioUploading(true);
+            const base64 = await FileSystem.readAsStringAsync(uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        file: `data:audio/m4a;base64,${base64}`,
+                        upload_preset: process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+                        resource_type: "video", // cloudinary uses video for audio
+                    }),
+                }
+            );
+
+            const data = await response.json();
+            return data.secure_url;
+        } catch (err) {
+            console.error("Failed to upload audio:", err);
+            return null;
+        } finally {
+            setAudioUploading(false);
+        }
+    };
+
+    const handleRecordingComplete = async (uri: string) => {
+        setShowVoiceRecorder(false);
+        const url = await uploadAudio(uri);
+        if (url) setAudioUri(url);
+    };
+
+    const handleSendVoiceFeedback = async () => {
+        if (!audioUri) return;
+        try {
+            setFeedbackLoading(true);
+            await api.sendFeedback(
+                user!.username,
+                null,
+                null,
+                audioUri,
+                "voice"
+            );
+            setFeedbackSent(true);
+            setAudioUri(null);
             setTimeout(() => {
                 setFeedbackModalVisible(false);
                 setFeedbackSent(false);
             }, 1500);
-        } catch (err) {
-            console.error("Failed to send feedback:", err);
+        } catch (err: any) {
+            const message = err?.message || "";
+            if (message.includes("Premium required")) {
+                setFeedbackError(i18n.t("premiumFeature"));
+            } else {
+                console.error("Failed to send voice feedback:", err);
+            }
         } finally {
             setFeedbackLoading(false);
         }
@@ -180,11 +289,57 @@ export default function UserProfileScreen() {
                             <Text className="text-5xl">🎉</Text>
                             <Text className="text-white text-lg font-bold">{i18n.t("whispaSent")}</Text>
                         </View>
+                    ) : showVoiceRecorder ? (
+                        <VoiceRecorder
+                            onRecordingComplete={handleRecordingComplete}
+                            onCancel={() => setShowVoiceRecorder(false)}
+                        />
+                    ) : audioUploading ? (
+                        <View className="flex-1 justify-center items-center gap-4">
+                            <ActivityIndicator size="large" color="#1DB954" />
+                            <Text className="text-[#555] text-sm">{i18n.t("uploadingAudio")}</Text>
+                        </View>
+                    ) : audioUri ? (
+                        // preview recorded audio before sending
+                        <View className="gap-4">
+                            <Text className="text-[#b3b3b3] text-sm">{i18n.t("voicePreview")}</Text>
+                            <VoicePlayer audioUrl={audioUri} />
+                            <Pressable
+                                onPress={handleSendVoiceFeedback}
+                                disabled={feedbackLoading}
+                                className="bg-[#1DB954] rounded-full py-4 items-center"
+                            >
+                                {feedbackLoading ? (
+                                    <ActivityIndicator color="black" />
+                                ) : (
+                                    <Text className="text-black font-bold text-base">{i18n.t("send")}</Text>
+                                )}
+                            </Pressable>
+                            <Pressable
+                                onPress={() => setAudioUri(null)}
+                                className="items-center py-2"
+                            >
+                                <Text className="text-[#555] text-sm">{i18n.t("recordAgain")}</Text>
+                            </Pressable>
+                        </View>
                     ) : (
                         <>
+                            {/* Daily count */}
+                            {!currentUserIsPremium && (
+                                <View className="flex-row justify-between items-center mb-3">
+                                    <Text className="text-[#555] text-xs">{i18n.t("dailyLimit")}</Text>
+                                    <View className={`px-3 py-1 rounded-full border ${dailyCount >= 10 ? "border-red-500 bg-red-500/10" : "border-[#282828] bg-[#1a1a1a]"}`}>
+                                        <Text className={`text-xs font-semibold ${dailyCount >= 10 ? "text-red-500" : "text-[#555]"}`}>
+                                            {dailyCount}/10
+                                        </Text>
+                                    </View>
+                                </View>
+                            )}
+
                             <Text className="text-[#b3b3b3] text-sm mb-3">
                                 {i18n.t("whispaAnonymous")}
                             </Text>
+
                             <TextInput
                                 className="bg-[#1a1a1a] text-white px-4 py-4 rounded-2xl border border-[#282828] mb-4"
                                 placeholder={i18n.t("writeWhispaPlaceholder")}
@@ -199,9 +354,51 @@ export default function UserProfileScreen() {
                             <Text className="text-[#555] text-xs text-right mb-2">
                                 {feedbackText.length}/200
                             </Text>
+
                             {feedbackError ? (
                                 <Text className="text-red-500 text-xs mb-3">{feedbackError}</Text>
                             ) : null}
+
+                            {/* Show username toggle */}
+                            <TouchableOpacity
+                                activeOpacity={currentUserIsPremium ? 1 : 0.7}
+                                onPress={() => { if (!currentUserIsPremium) alert(i18n.t("premiumFeature")); }}
+                                className="flex-row justify-between items-center bg-[#1a1a1a] border border-[#282828] rounded-2xl px-4 py-3 mb-4"
+                            >
+                                <View>
+                                    <View className="flex-row items-center gap-2">
+                                        <Text className="text-white font-semibold text-sm">{i18n.t("showMyUsername")}</Text>
+                                        {!currentUserIsPremium && <Text className="text-yellow-400 text-xs">💎</Text>}
+                                    </View>
+                                    <Text className="text-[#555] text-xs mt-0.5">{i18n.t("showMyUsernameDesc")}</Text>
+                                </View>
+                                <Switch
+                                    value={showUsername}
+                                    onValueChange={currentUserIsPremium ? setShowUsername : () => alert(i18n.t("premiumFeature"))}
+                                    trackColor={{ false: "#282828", true: "#1DB954" }}
+                                    thumbColor="white"
+                                    disabled={!currentUserIsPremium}
+                                />
+                            </TouchableOpacity>
+
+                            {/* Voice whispa button — premium only */}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (!currentUserIsPremium) {
+                                        alert(i18n.t("premiumFeature"));
+                                        return;
+                                    }
+                                    setShowVoiceRecorder(true);
+                                }}
+                                className="flex-row items-center justify-center gap-2 border border-[#282828] bg-[#1a1a1a] rounded-full py-3 mb-4"
+                            >
+                                <Ionicons name="mic-outline" size={16} color={currentUserIsPremium ? "#1DB954" : "#555"} />
+                                <Text className={`text-sm font-semibold ${currentUserIsPremium ? "text-[#1DB954]" : "text-[#555]"}`}>
+                                    {i18n.t("sendVoiceWhispa")}
+                                </Text>
+                                {!currentUserIsPremium && <Text className="text-yellow-400 text-xs">💎</Text>}
+                            </TouchableOpacity>
+
                             <TouchableOpacity
                                 onPress={handleSendFeedback}
                                 disabled={feedbackLoading || !feedbackText.trim()}
@@ -301,7 +498,10 @@ export default function UserProfileScreen() {
                             </View>
                         ) : canWhispa ? (
                             <TouchableOpacity
-                                onPress={() => setFeedbackModalVisible(true)}
+                                onPress={() => {
+                                    setFeedbackModalVisible(true);
+                                    fetchDailyCount(); // ← add this
+                                }}
                                 className="bg-[#1a1a1a] border border-[#282828] rounded-full py-3 items-center"
                             >
                                 <Text className="text-white font-semibold text-base">
@@ -315,6 +515,8 @@ export default function UserProfileScreen() {
                                 </Text>
                             </View>
                         )}
+
+
 
                     </View>
                 )}
