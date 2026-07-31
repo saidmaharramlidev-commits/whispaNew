@@ -9,7 +9,9 @@
       "distribution": "internal",
       "env": {
         "EAS_BUILD_NPM_FLAGS": "--legacy-peer-deps",
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "development",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_YW1hemluZy13ZXJld29sZi0xMC5jbGVyay5hY2NvdW50cy5kZXYk",
+        "EXPO_PUBLIC_API_URL": "https://feedbackapp-drsj.onrender.com"
       }
     },
     "preview": {
@@ -19,9 +21,17 @@
       },
       "env": {
         "EAS_BUILD_NPM_FLAGS": "--legacy-peer-deps",
-        "APP_VARIANT": "production"
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsud2hpc3BhbWUueHl6JA",
+        "EXPO_PUBLIC_API_URL": "https://whispame.xyz"
       }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsud2hpc3BhbWUueHl6JA",
+        "EXPO_PUBLIC_API_URL": "https://whispame.xyz"
+      }
+    }
   }
 }
