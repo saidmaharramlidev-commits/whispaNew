@@ -37,6 +37,7 @@ export default function UserProfileScreen() {
     const [feedbackSent, setFeedbackSent] = useState(false);
     const [feedbackError, setFeedbackError] = useState("");
     const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+    const [dailyCount, setDailyCount] = useState(0);
 
     useEffect(() => {
         fetchUser();
@@ -53,6 +54,15 @@ export default function UserProfileScreen() {
             console.error("Failed to load user:", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchDailyCount = async () => {
+        try {
+            const data = await api.getDailyCount();
+            setDailyCount(data.data.count);
+        } catch (err) {
+            console.error("Failed to fetch daily count:", err);
         }
     };
 
@@ -94,12 +104,18 @@ export default function UserProfileScreen() {
             await api.sendFeedback(user!.username, feedbackText);
             setFeedbackSent(true);
             setFeedbackText("");
+            setDailyCount(prev => prev + 1)
             setTimeout(() => {
                 setFeedbackModalVisible(false);
                 setFeedbackSent(false);
             }, 1500);
-        } catch (err) {
-            console.error("Failed to send feedback:", err);
+        } catch (err: any) {
+            const message = err?.message || "";
+            if (message.includes("Daily limit reached")) {
+                setFeedbackError(i18n.t("dailyLimitReached"));
+            } else {
+                console.error("Failed to send feedback:", err);
+            }
         } finally {
             setFeedbackLoading(false);
         }
@@ -185,6 +201,19 @@ export default function UserProfileScreen() {
                             <Text className="text-[#b3b3b3] text-sm mb-3">
                                 {i18n.t("whispaAnonymous")}
                             </Text>
+
+                            {/* Daily count indicator */}
+                            <View className="flex-row justify-between items-center mb-3">
+                                <Text className="text-[#555] text-xs">{i18n.t("dailyLimit")}</Text>
+                                <View className={`px-3 py-1 rounded-full border ${dailyCount >= 10 ? "border-red-500 bg-red-500/10" : "border-[#282828] bg-[#1a1a1a]"}`}>
+                                    <Text className={`text-xs font-semibold ${dailyCount >= 10 ? "text-red-500" : "text-[#555]"}`}>
+                                        {dailyCount}/10
+                                    </Text>
+                                </View>
+                            </View>
+
+
+
                             <TextInput
                                 className="bg-[#1a1a1a] text-white px-4 py-4 rounded-2xl border border-[#282828] mb-4"
                                 placeholder={i18n.t("writeWhispaPlaceholder")}
@@ -196,6 +225,9 @@ export default function UserProfileScreen() {
                                 maxLength={200}
                                 textAlignVertical="top"
                             />
+
+
+
                             <Text className="text-[#555] text-xs text-right mb-2">
                                 {feedbackText.length}/200
                             </Text>
@@ -301,7 +333,10 @@ export default function UserProfileScreen() {
                             </View>
                         ) : canWhispa ? (
                             <TouchableOpacity
-                                onPress={() => setFeedbackModalVisible(true)}
+                                onPress={() => {
+                                    setFeedbackModalVisible(true)
+                                    fetchDailyCount();
+                                }}
                                 className="bg-[#1a1a1a] border border-[#282828] rounded-full py-3 items-center"
                             >
                                 <Text className="text-white font-semibold text-base">

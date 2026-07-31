@@ -181,6 +181,8 @@ const i18n = new I18n({
 
         swipeDelete: "swipe to delete",
         swipeLike: "swipe to like",
+        dailyLimitReached: "You've reached your 10 whispa daily limit.",
+        dailyLimit: "Daily whispas:",
     },
 
     az: {
@@ -361,6 +363,9 @@ const i18n = new I18n({
 
         swipeDelete: "silmək üçün sürüşdür",
         swipeLike: "bəyənmək üçün sürüşdür",
+
+        dailyLimitReached: "Gündəlik 10 whispa limitinə çatdınız.",
+        dailyLimit: "Gündəlik whispalar:",
 
 
     },

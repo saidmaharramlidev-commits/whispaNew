@@ -28,7 +28,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [username, setUsername] = useState<string>("");
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [dailyCount, setDailyCount] = useState(0);
 
 
 
@@ -59,6 +59,9 @@ export default function HomeScreen() {
     try {
       const data = await api.getMe();
       setUsername(data.data.username);
+
+      const countData = await api.getDailyCount();
+      setDailyCount(countData.data.count);
     } catch (err) {
       console.error("Failed to fetch username:", err);
     }
@@ -123,6 +126,16 @@ export default function HomeScreen() {
         >
           <Ionicons name="share-outline" size={20} color="#b3b3b3" />
         </TouchableOpacity>
+
+
+        <View className="bg-[#1a1a1a] border border-[#282828] px-3 py-2 rounded-full flex-row items-center gap-1">
+          <Ionicons name="chatbubble-outline" size={12} color="#555" />
+          <Text className="text-[#555] text-xs font-semibold">{dailyCount}/10</Text>
+        </View>
+
+
+
+
         <TouchableOpacity
           onPress={() => setShowLiked(true)}
           className="bg-[#1a1a1a] px-4 py-2 rounded-full border border-[#282828]"

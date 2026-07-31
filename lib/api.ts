@@ -72,6 +72,8 @@ export const useApi = () => {
             method: "PATCH",
         });
 
+    const getDailyCount = () => request("/feedbacks/daily-count");
+
     return {
         getMe,
         updateMe,
@@ -85,6 +87,8 @@ export const useApi = () => {
         sendFeedback,
         deleteFeedback,
         toggleLikeFeedback,
-        removeFollower
+        removeFollower,
+        getDailyCount,
+
     };
 };
