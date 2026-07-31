@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
@@ -8,58 +8,23 @@ type Props = {
 };
 
 export default function VoicePlayer({ audioUrl }: Props) {
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [position, setPosition] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const player = useAudioPlayer({ uri: audioUrl });
+    const status = useAudioPlayerStatus(player);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        return () => {
-            if (sound) sound.unloadAsync();
-        };
-    }, [sound]);
+        if (status.isLoaded) setIsLoading(false);
+    }, [status.isLoaded]);
 
     const handlePlayPause = async () => {
         try {
-            if (isPlaying && sound) {
-                await sound.pauseAsync();
-                setIsPlaying(false);
-                return;
+            if (status.playing) {
+                player.pause();
+            } else {
+                player.play();
             }
-
-            if (sound) {
-                await sound.playAsync();
-                setIsPlaying(true);
-                return;
-            }
-
-            // load sound for first time
-            setIsLoading(true);
-            await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-
-            const { sound: newSound } = await Audio.Sound.createAsync(
-                { uri: audioUrl },
-                { shouldPlay: true },
-                (status) => {
-                    if (status.isLoaded) {
-                        setPosition(status.positionMillis || 0);
-                        setDuration(status.durationMillis || 0);
-                        if (status.didJustFinish) {
-                            setIsPlaying(false);
-                            setPosition(0);
-                        }
-                    }
-                }
-            );
-
-            setSound(newSound);
-            setIsPlaying(true);
-            setIsLoading(false);
-
         } catch (err) {
             console.error("Failed to play audio:", err);
-            setIsLoading(false);
         }
     };
 
@@ -68,7 +33,10 @@ export default function VoicePlayer({ audioUrl }: Props) {
         return `0:${seconds.toString().padStart(2, "0")}`;
     };
 
+    const position = status.currentTime * 1000 || 0;
+    const duration = status.duration * 1000 || 0;
     const progress = duration > 0 ? (position / duration) * 100 : 0;
+    const isPlaying = status.playing || false;
 
     return (
         <View className="flex-row items-center gap-3 bg-[#1a1a1a] border border-[#282828] rounded-2xl px-4 py-3">

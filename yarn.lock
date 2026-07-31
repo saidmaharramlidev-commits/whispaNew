@@ -4296,6 +4296,11 @@ expo-asset@~56.0.19:
     "@expo/image-utils" "^0.10.2"
     expo-constants "~56.0.20"
 
+expo-audio@~56.0.13:
+  version "56.0.13"
+  resolved "https://registry.yarnpkg.com/expo-audio/-/expo-audio-56.0.13.tgz#c8979f35bc6c53575d46e55b3aa714836cda69f0"
+  integrity sha512-pfBmT/8OYbhrb37ECk+fC1EstLBFxMTioF4uZrAEeOj3uCgjproj1qYmkpsQLJIoEOMPSIw1iSfBEMl10v1DDA==
+
 expo-auth-session@~56.0.14:
   version "56.0.15"
   resolved "https://registry.npmjs.org/expo-auth-session/-/expo-auth-session-56.0.15.tgz"
@@ -4307,11 +4312,6 @@ expo-auth-session@~56.0.14:
     expo-linking "~56.0.15"
     expo-web-browser "~56.0.5"
     invariant "^2.2.4"
-
-expo-av@^16.0.8:
-  version "16.0.8"
-  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-16.0.8.tgz#b1671127f3b2ecaeb9c69fc2301cf791d4504dd6"
-  integrity sha512-cmVPftGR/ca7XBgs7R6ky36lF3OC0/MM/lpgX/yXqfv0jASTsh7AYX9JxHCwFmF+Z6JEB1vne9FDx4GiLcGreQ==
 
 expo-constants@~56.0.18, expo-constants@~56.0.20:
   version "56.0.20"

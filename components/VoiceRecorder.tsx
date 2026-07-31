@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 type Props = {
     onRecordingComplete: (uri: string) => void;
@@ -9,46 +9,36 @@ type Props = {
 };
 
 export default function VoiceRecorder({ onRecordingComplete, onCancel }: Props) {
-    const [recording, setRecording] = useState<Audio.Recording | null>(null);
+    const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
     const [isRecording, setIsRecording] = useState(false);
     const [seconds, setSeconds] = useState(0);
-    const [isUploading, setIsUploading] = useState(false);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const MAX_SECONDS = 8;
 
     useEffect(() => {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
-            if (recording) recording.stopAndUnloadAsync();
+            if (isRecording) audioRecorder.stop();
         };
     }, []);
 
     const startRecording = async () => {
         try {
-            const { granted } = await Audio.requestPermissionsAsync();
-            if (!granted) {
+            const status = await AudioModule.requestRecordingPermissionsAsync();
+            if (!status.granted) {
                 alert("Microphone permission required");
                 return;
             }
 
-            await Audio.setAudioModeAsync({
-                allowsRecordingIOS: true,
-                playsInSilentModeIOS: true,
-            });
-
-            const { recording: newRecording } = await Audio.Recording.createAsync(
-                Audio.RecordingOptionsPresets.HIGH_QUALITY
-            );
-
-            setRecording(newRecording);
+            await audioRecorder.prepareToRecordAsync();
+            audioRecorder.record();
             setIsRecording(true);
             setSeconds(0);
 
-            // start timer
             timerRef.current = setInterval(() => {
                 setSeconds(prev => {
                     if (prev >= MAX_SECONDS - 1) {
-                        stopRecording(newRecording);
+                        stopRecording();
                         return MAX_SECONDS;
                     }
                     return prev + 1;
@@ -60,17 +50,12 @@ export default function VoiceRecorder({ onRecordingComplete, onCancel }: Props) 
         }
     };
 
-    const stopRecording = async (rec?: Audio.Recording) => {
+    const stopRecording = async () => {
         try {
             if (timerRef.current) clearInterval(timerRef.current);
-            const activeRecording = rec || recording;
-            if (!activeRecording) return;
-
             setIsRecording(false);
-            await activeRecording.stopAndUnloadAsync();
-            const uri = activeRecording.getURI();
-            setRecording(null);
-
+            await audioRecorder.stop();
+            const uri = audioRecorder.uri;
             if (uri) {
                 onRecordingComplete(uri);
             }
@@ -103,29 +88,25 @@ export default function VoiceRecorder({ onRecordingComplete, onCancel }: Props) 
             </View>
 
             {/* Record button */}
-            {isUploading ? (
-                <ActivityIndicator color="#1DB954" size="large" />
-            ) : (
-                <Pressable
-                    onPress={isRecording ? () => stopRecording() : startRecording}
-                    style={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 40,
-                        backgroundColor: isRecording ? "#ef4444" : "#1DB954",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderWidth: 4,
-                        borderColor: isRecording ? "#ef444440" : "#1DB95440",
-                    }}
-                >
-                    <Ionicons
-                        name={isRecording ? "stop" : "mic"}
-                        size={32}
-                        color="white"
-                    />
-                </Pressable>
-            )}
+            <Pressable
+                onPress={isRecording ? () => stopRecording() : startRecording}
+                style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    backgroundColor: isRecording ? "#ef4444" : "#1DB954",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderWidth: 4,
+                    borderColor: isRecording ? "#ef444440" : "#1DB95440",
+                }}
+            >
+                <Ionicons
+                    name={isRecording ? "stop" : "mic"}
+                    size={32}
+                    color="white"
+                />
+            </Pressable>
 
             <Text className="text-[#555] text-xs text-center">
                 {isRecording ? "Tap to stop" : "Max 10 seconds"}
