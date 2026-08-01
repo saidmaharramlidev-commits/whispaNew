@@ -23,7 +23,7 @@ const config: ExpoConfig = {
     package: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    versionCode: 2,
+    versionCode: 3,
     googleServicesFile: isDevelopment
       ? "./google-services(dev).json"
       : "./google-services.json",
@@ -90,7 +90,7 @@ const config: ExpoConfig = {
       }
     ],
     [
-      "expo-av",
+      "expo-audio",
       {
         microphonePermission: "Allow WhispaMe to access your microphone to send voice whispas."
       }
