@@ -58,6 +58,7 @@ export default function HomeScreen() {
   const fetchUsername = async () => {
     try {
       const data = await api.getMe();
+      if (!data?.data) return;
       setUsername(data.data.username);
 
       const countData = await api.getDailyCount();

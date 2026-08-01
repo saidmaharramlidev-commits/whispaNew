@@ -23,14 +23,14 @@
         "EAS_BUILD_NPM_FLAGS": "--legacy-peer-deps",
         "APP_VARIANT": "production",
         "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsud2hpc3BhbWUueHl6JA",
-        "EXPO_PUBLIC_API_URL": "https://whispame.xyz"
+        "EXPO_PUBLIC_API_URL": "https://www.whispame.xyz"
       }
     },
     "production": {
       "env": {
         "APP_VARIANT": "production",
         "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsud2hpc3BhbWUueHl6JA",
-        "EXPO_PUBLIC_API_URL": "https://whispame.xyz"
+        "EXPO_PUBLIC_API_URL": "https://www.whispame.xyz"
       }
     }
   }

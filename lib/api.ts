@@ -5,8 +5,11 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 export const useApi = () => {
     const { getToken } = useAuth();
 
+
     const request = async (endpoint: string, options: RequestInit = {}) => {
         const token = await getToken();
+
+
 
         if (!token) {
             console.log("No token available for:", endpoint)
