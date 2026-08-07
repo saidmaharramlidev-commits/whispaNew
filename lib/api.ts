@@ -1,9 +1,11 @@
 import { useAuth } from "@clerk/expo";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const PREMIUM_PRICE_DISPLAY = "$1.99";
 
 export const useApi = () => {
     const { getToken } = useAuth();
+
 
     const request = async (endpoint: string, options: RequestInit = {}) => {
         const token = await getToken();
@@ -26,7 +28,9 @@ export const useApi = () => {
 
         if (!response.ok) {
             console.log("API Error:", response.status, endpoint, JSON.stringify(data))
-            throw new Error(data.message || "Something went wrong");
+            const err = new Error(data.message || data.error || "Something went wrong") as Error & { status?: number };
+            err.status = response.status;
+            throw err;
         }
 
         return data;
@@ -65,11 +69,12 @@ export const useApi = () => {
         text: string | null,
         senderUsername?: string | null,
         audioUrl?: string | null,
-        type?: "text" | "voice"
+        type?: "text" | "voice" | "image",
+        imageUrl?: string | null,
     ) =>
         request(`/feedbacks/${username}`, {
             method: "POST",
-            body: JSON.stringify({ text, senderUsername, audioUrl, type }),
+            body: JSON.stringify({ text, senderUsername, audioUrl, imageUrl, type }),
         });
 
 
@@ -100,6 +105,8 @@ export const useApi = () => {
         request(`/streaks/${clerkId}`);
 
     const getDailyCount = () => request("/feedbacks/daily-count");
+    const reportFeedback = (id: string) =>
+        request(`/feedbacks/${id}/report`, { method: "POST" });
 
     return {
         getMe,
@@ -119,6 +126,8 @@ export const useApi = () => {
         getMyReplies,
         deleteReply,
         getStreak,
-        getDailyCount
+        getDailyCount,
+        reportFeedback,
+
     };
 };

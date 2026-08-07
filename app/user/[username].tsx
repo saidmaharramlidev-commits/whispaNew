@@ -1,3 +1,4 @@
+import ImageWhispaPicker from "@/components/ImageWhispaPicker";
 import VoicePlayer from "@/components/VoicePlayer";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import { useApi } from "@/lib/api";
@@ -23,6 +24,7 @@ type UserProfile = {
     isFollowedByThem: boolean;
     showFollowers: boolean;
     showFollowing: boolean;
+    isBlockedByThem: boolean;
 };
 
 export default function UserProfileScreen() {
@@ -47,6 +49,40 @@ export default function UserProfileScreen() {
     const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
     const [audioUri, setAudioUri] = useState<string | null>(null);
     const [audioUploading, setAudioUploading] = useState(false);
+    const [showImagePicker, setShowImagePicker] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+
+
+    const handleSendImageFeedback = async () => {
+        if (!imageUrl) return;
+        try {
+            setFeedbackLoading(true);
+            await api.sendFeedback(
+                user!.username,
+                null,
+                null,
+                null,
+                "image",
+                imageUrl
+            );
+            setFeedbackSent(true);
+            setImageUrl(null);
+            setTimeout(() => {
+                setFeedbackModalVisible(false);
+                setFeedbackSent(false);
+            }, 1500);
+        } catch (err: any) {
+            const message = err?.message || "";
+            if (message.includes("Premium required")) {
+                setFeedbackError(i18n.t("premiumFeature"));
+            } else {
+                console.error("Failed to send image feedback:", err);
+            }
+        } finally {
+            setFeedbackLoading(false);
+        }
+    };
 
 
     const fetchUser = async () => {
@@ -230,8 +266,7 @@ export default function UserProfileScreen() {
         );
     }
 
-    const canWhispa = user.isAcceptingFeedback && (!user.followersOnly || isFollowedByThem);
-
+    const canWhispa = user.isAcceptingFeedback && (!user.followersOnly || isFollowedByThem) && !user.isBlockedByThem;
     return (
         <View className="flex-1 bg-black" style={{ paddingTop: insets.top }}>
 
@@ -299,6 +334,39 @@ export default function UserProfileScreen() {
                             <ActivityIndicator size="large" color="#1DB954" />
                             <Text className="text-[#555] text-sm">{i18n.t("uploadingAudio")}</Text>
                         </View>
+                    ) : showImagePicker ? (
+                        <ImageWhispaPicker
+                            onImageSelected={(url) => {
+                                setImageUrl(url);
+                                setShowImagePicker(false);
+                            }}
+                            onCancel={() => setShowImagePicker(false)}
+                        />
+                    ) : imageUrl ? (
+                        <View className="gap-4">
+                            <Text className="text-[#b3b3b3] text-sm">{i18n.t("imagePreview")}</Text>
+                            <Image
+                                source={{ uri: imageUrl }}
+                                style={{ width: "100%", aspectRatio: 1, borderRadius: 16 }}
+                            />
+                            <Pressable
+                                onPress={handleSendImageFeedback}
+                                disabled={feedbackLoading}
+                                className="bg-[#1DB954] rounded-full py-4 items-center"
+                            >
+                                {feedbackLoading ? (
+                                    <ActivityIndicator color="black" />
+                                ) : (
+                                    <Text className="text-black font-bold text-base">{i18n.t("send")}</Text>
+                                )}
+                            </Pressable>
+                            <Pressable
+                                onPress={() => setImageUrl(null)}
+                                className="items-center py-2"
+                            >
+                                <Text className="text-[#555] text-sm">{i18n.t("selectImage")}</Text>
+                            </Pressable>
+                        </View>
                     ) : audioUri ? (
                         // preview recorded audio before sending
                         <View className="gap-4">
@@ -362,7 +430,13 @@ export default function UserProfileScreen() {
                             {/* Show username toggle */}
                             <TouchableOpacity
                                 activeOpacity={currentUserIsPremium ? 1 : 0.7}
-                                onPress={() => { if (!currentUserIsPremium) alert(i18n.t("premiumFeature")); }}
+                                onPress={() => {
+                                    if (!currentUserIsPremium) {
+                                        setFeedbackModalVisible(false);
+                                        router.push("/premium");
+                                        return;
+                                    }
+                                }}
                                 className="flex-row justify-between items-center bg-[#1a1a1a] border border-[#282828] rounded-2xl px-4 py-3 mb-4"
                             >
                                 <View>
@@ -374,18 +448,43 @@ export default function UserProfileScreen() {
                                 </View>
                                 <Switch
                                     value={showUsername}
-                                    onValueChange={currentUserIsPremium ? setShowUsername : () => alert(i18n.t("premiumFeature"))}
+                                    onValueChange={currentUserIsPremium ? setShowUsername : () => {
+                                        setFeedbackModalVisible(false);
+                                        router.push("/premium");
+                                    }}
                                     trackColor={{ false: "#282828", true: "#1DB954" }}
                                     thumbColor="white"
                                     disabled={!currentUserIsPremium}
                                 />
                             </TouchableOpacity>
 
+                            {/* Image whispa button — premium only */}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (!currentUserIsPremium) {
+                                        setFeedbackModalVisible(false);
+                                        router.push("/premium");
+                                        return;
+                                    }
+                                    setShowImagePicker(true);
+                                }}
+                                className="flex-row items-center justify-center gap-2 border border-[#282828] bg-[#1a1a1a] rounded-full py-3 mb-4"
+                            >
+                                <Ionicons name="image-outline" size={16} color={currentUserIsPremium ? "#1DB954" : "#555"} />
+                                <Text className={`text-sm font-semibold ${currentUserIsPremium ? "text-[#1DB954]" : "text-[#555]"}`}>
+                                    {i18n.t("sendImageWhispa")}
+                                </Text>
+                                {!currentUserIsPremium && <Text className="text-yellow-400 text-xs">💎</Text>}
+                            </TouchableOpacity>
+
+
+
                             {/* Voice whispa button — premium only */}
                             <TouchableOpacity
                                 onPress={() => {
                                     if (!currentUserIsPremium) {
-                                        alert(i18n.t("premiumFeature"));
+                                        setFeedbackModalVisible(false);
+                                        router.push("/premium");
                                         return;
                                     }
                                     setShowVoiceRecorder(true);
@@ -398,6 +497,11 @@ export default function UserProfileScreen() {
                                 </Text>
                                 {!currentUserIsPremium && <Text className="text-yellow-400 text-xs">💎</Text>}
                             </TouchableOpacity>
+
+
+
+
+
 
                             <TouchableOpacity
                                 onPress={handleSendFeedback}
@@ -490,7 +594,13 @@ export default function UserProfileScreen() {
                         )}
 
                         {/* Send Whispa */}
-                        {!user.isAcceptingFeedback ? (
+                        {user.isBlockedByThem ? (
+                            <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
+                                <Text className="text-[#555] font-semibold text-base text-center">
+                                    {i18n.t("youAreBlocked")}
+                                </Text>
+                            </View>
+                        ) : !user.isAcceptingFeedback ? (
                             <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
                                 <Text className="text-[#555] font-semibold text-base text-center">
                                     {i18n.t("inboxClosed")}

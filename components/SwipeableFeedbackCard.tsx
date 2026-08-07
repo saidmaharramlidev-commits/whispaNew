@@ -1,9 +1,10 @@
 import VoicePlayer from "@/components/VoicePlayer";
 import i18n from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect } from "react";
-import { Dimensions, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, Image, Text, View } from "react-native";
 import { Gesture, GestureDetector, Pressable } from "react-native-gesture-handler";
+
 
 import Animated, {
     interpolate,
@@ -26,21 +27,26 @@ type Props = {
     isPremium: boolean;
     canReply: boolean;
     audioUrl?: string | null;
-    type?: "text" | "voice";
+    type?: "text" | "voice" | "image";
+    imageUrl?: string | null;
+    onReport: () => void;
 };
 
 
-export default function SwipeableFeedbackCard({ text, senderUsername, onLike, onDelete, onReply, isPremium, canReply, type, audioUrl }: Props) {
+export default function SwipeableFeedbackCard({ text, senderUsername, onLike, onDelete, onReply, isPremium, canReply, type, audioUrl, imageUrl, onReport }: Props) {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
+    const [isLocked, setIsLocked] = useState(false);
 
     useEffect(() => {
         translateX.value = 0;
         translateY.value = 0;
+        setIsLocked(false);
     }, [text]);
 
     const gesture = Gesture.Pan()
         .onUpdate((e) => {
+            if (isLocked) return;
             translateX.value = e.translationX;
             translateY.value = e.translationY * 0.2;
         })
@@ -139,10 +145,46 @@ export default function SwipeableFeedbackCard({ text, senderUsername, onLike, on
                         </Text>
                     </Animated.View>
 
-                    {/* Text or Voice content */}
+
+                    {/* Block button */}
+                    <Pressable
+                        onPress={onReport}
+                        style={{
+                            position: "absolute",
+                            top: 12,
+                            right: 12,
+                            zIndex: 20,
+                            paddingHorizontal: 9,
+                            paddingVertical: 5,
+                            borderRadius: 999,
+                            backgroundColor: "#2a1515",
+                            borderWidth: 1,
+                            borderColor: "#5a2222",
+                            opacity: isLocked ? 0.5 : 1,
+                        }}
+
+                    >
+                        <Text
+                            style={{
+                                color: "#ef4444",
+                                fontSize: 12,
+                                fontWeight: "600",
+                            }}
+                        >
+                            Block
+                        </Text>
+                    </Pressable>
+
+                    {/* Text or Voice or Image content */}
                     <View className="px-8 py-6 flex-1 justify-center" style={{ minHeight: 180 }}>
                         {type === "voice" && audioUrl ? (
                             <VoicePlayer audioUrl={audioUrl} />
+                        ) : type === "image" && imageUrl ? (
+                            <Image
+                                source={{ uri: imageUrl }}
+                                style={{ width: "100%", aspectRatio: 1, borderRadius: 12 }}
+                                resizeMode="cover"
+                            />
                         ) : (
                             <Text className="text-white text-xl text-center leading-9 tracking-wide">
                                 {text}

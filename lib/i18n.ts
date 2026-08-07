@@ -213,10 +213,51 @@ const i18n = new I18n({
 
         dailyLimit: "Daily whispas:",
 
-        sendVoiceWhispa: "Send Voice Whispa",
+        sendVoiceWhispa: "Send Voice Whispa (8 sec) ",
         uploadingAudio: "Uploading audio...",
         voicePreview: "Preview your voice whispa:",
         recordAgain: "Record again",
+
+
+        imageTooLarge: "Image must be under 5MB",
+        uploadingImage: "Uploading image...",
+        selectImage: "Select an image",
+        camera: "Camera",
+        gallery: "Gallery",
+        sendImageWhispa: "Send Image Whispa",
+        imagePreview: "Preview your image whispa:",
+
+        imageDisclaimer: "By sending an image, you agree it follows our community guidelines. Inappropriate images will result in account ban.",
+
+
+        voiceWhispa: "Voice whispa",
+        imageWhispa: "Image whispa",
+        reportedAndBlocked: "Whispa reported and sender blocked",
+
+        youAreBlocked: "You are blocked by this user",
+        // en
+        premiumTitle: "Unlock WhispaMe Premium",
+        premiumFeatureUnlimited: "Unlimited whispas — no daily limit",
+        premiumFeatureUsername: "Choose to reveal your username to the receiver",
+        premiumFeatureVoiceImage: "Send voice and image whispas",
+        premiumFeatureReply: "Reply to whispas you receive",
+        premiumComingSoon: "Purchases aren't available yet — check back soon!",
+        // en
+        premiumSubtitle: "Renews monthly. Cancel anytime.",
+        premiumBuyButton: "Subscribe",
+
+        // en
+        premiumPerMonth: " /month",
+        premiumRenewsAutomatically: "Subscription automatically renews unless cancelled at least 24 hours before the end of the current period.",
+        premiumManageSubscription: "Manage or cancel anytime in your App Store / Play Store account settings.",
+        premiumRestorePurchases: "Restore Purchases",
+        premiumRestoreSuccess: "Your subscription has been restored",
+        premiumRestoreNothingFound: "No active subscription found for this account",
+        premiumAlreadySubscribed: "You're already a Premium member",
+        premiumCancelled: "Your subscription was cancelled",
+        premiumExpired: "Your Premium subscription has expired",
+
+
     },
 
     az: {
@@ -429,10 +470,50 @@ const i18n = new I18n({
 
         dailyLimit: "Gündəlik whispalar:",
 
-        sendVoiceWhispa: "Səsli Whispa Göndər",
+        sendVoiceWhispa: "Səsli Whispa Göndər (8 saniyə) ",
         uploadingAudio: "Səs yüklənir...",
         voicePreview: "Səsli whispanıza baxın:",
         recordAgain: "Yenidən qeyd et",
+
+
+        imageTooLarge: "Şəkil 5MB-dan az olmalıdır",
+        uploadingImage: "Şəkil yüklənir...",
+        selectImage: "Şəkil seçin",
+        camera: "Kamera",
+        gallery: "Qalereya",
+        sendImageWhispa: "Şəkilli Whispa Göndər",
+        imagePreview: "Şəkilli whispanıza baxın:",
+        imageDisclaimer: "Şəkil göndərməklə icma qaydalarına uyğun olduğunu təsdiqləyirsiniz. Uygunsuz şəkillər hesabın bloklanmasına səbəb olar.",
+
+        voiceWhispa: "Səsli whispa",
+        imageWhispa: "Şəkilli whispa",
+        reportedAndBlocked: "Whispa şikayət edildi və göndərən bloklandı",
+
+
+        youAreBlocked: "Bu istifadəçi tərəfindən bloklandınız",
+
+
+        // az
+        premiumTitle: "WhispaMe Premium-u aç",
+        // az
+        premiumSubtitle: "Aylıq yenilənir. İstənilən vaxt ləğv edin.",
+        premiumBuyButton: "Abunə ol",
+        premiumFeatureUnlimited: "Limitsiz whispa — gündəlik limit yoxdur",
+        premiumFeatureUsername: "İstifadəçi adınızı qəbul edənə göstərmək seçimi",
+        premiumFeatureVoiceImage: "Səsli və şəkilli whispa göndərin",
+        premiumFeatureReply: "Aldığınız whispalara cavab verin",
+        premiumComingSoon: "Alışlar hələ mövcud deyil — tezliklə yoxlayın!",
+
+        // az
+        premiumPerMonth: "/ay",
+        premiumRenewsAutomatically: "Abunə cari dövrün bitməsinə ən azı 24 saat qalmış ləğv edilmədiyi halda avtomatik yenilənir.",
+        premiumManageSubscription: "İstənilən vaxt App Store / Play Store hesab ayarlarınızdan idarə edin və ya ləğv edin.",
+        premiumRestorePurchases: "Alışları Bərpa Et",
+        premiumRestoreSuccess: "Abunəniz bərpa edildi",
+        premiumRestoreNothingFound: "Bu hesab üçün aktiv abunə tapılmadı",
+        premiumAlreadySubscribed: "Siz artıq Premium üzvüsünüz",
+        premiumCancelled: "Abunəniz ləğv edildi",
+        premiumExpired: "Premium abunəniz bitib",
 
 
     },

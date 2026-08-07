@@ -1,13 +1,17 @@
 import LikedOverlay from "@/components/LikedOverlay";
+import PremiumBadge from "@/components/PremiumBadge";
 import ShareProfileModal from "@/components/ShareProfileModal";
 import SwipeableFeedbackCard from "@/components/SwipeableFeedbackCard"; // ← new
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Modal, RefreshControl, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+
 
 type Feedback = {
   _id: string;
@@ -16,7 +20,8 @@ type Feedback = {
   senderUsername?: string | null;
   senderId?: string | null;
   audioUrl?: string | null;
-  type?: "text" | "voice";
+  type?: "text" | "voice" | "image";
+  imageUrl?: string | null;
 };
 
 export default function HomeScreen() {
@@ -132,6 +137,20 @@ export default function HomeScreen() {
     }
   };
 
+
+  const handleReport = async () => {
+    if (!currentFeedback) return;
+    try {
+      await api.reportFeedback(currentFeedback._id);
+      setCurrentIndex(prev => prev + 1); // move to next whispa
+    } catch (err) {
+      console.error("Failed to report feedback:", err);
+    }
+  };
+
+
+
+
   const currentFeedback = feedbacks[currentIndex];
   const isFinished = currentIndex >= feedbacks.length;
 
@@ -148,12 +167,20 @@ export default function HomeScreen() {
 
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 py-4">
-        <TouchableOpacity
-          onPress={() => setShowShareModal(true)}
-          className="bg-[#1a1a1a] p-2 rounded-full border border-[#282828]"
-        >
-          <Ionicons name="share-outline" size={20} color="#b3b3b3" />
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity
+            onPress={() => setShowShareModal(true)}
+            className="bg-[#1a1a1a] p-2 rounded-full border border-[#282828]"
+          >
+            <Ionicons name="share-outline" size={20} color="#b3b3b3" />
+          </TouchableOpacity>
+
+          {!currentUserIsPremium && (
+            <PremiumBadge onPress={() => router.push("/premium" as any)} />
+          )}
+        </View>
+
+
 
 
 
@@ -292,16 +319,18 @@ export default function HomeScreen() {
                 text={currentFeedback.text}
                 senderUsername={currentFeedback.senderUsername}
                 audioUrl={currentFeedback.audioUrl}
+                imageUrl={currentFeedback.imageUrl}
                 type={currentFeedback.type}
                 onLike={handleLike}
                 onDelete={handleDelete}
                 onReply={() => {
                   if (!currentUserIsPremium) {
-                    alert(i18n.t("premiumFeature"));
+                    router.push("/premium");
                     return;
                   }
                   setReplyModalVisible(true);
                 }}
+                onReport={handleReport}
                 isPremium={currentUserIsPremium}
                 canReply={!!currentFeedback.senderId}
               />

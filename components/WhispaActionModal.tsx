@@ -9,7 +9,8 @@ type Feedback = {
     text: string | null;
     senderUsername?: string | null;
     audioUrl?: string | null;
-    type?: "text" | "voice";
+    type?: "text" | "voice" | "image";
+    imageUrl?: string | null;
 };
 type Props = {
     visible: boolean;
@@ -74,16 +75,21 @@ export default function WhispaActionModal({ visible, feedback, onClose, onDelete
                     <View className="w-10 h-1 rounded-full bg-[#333]" />
                 </View>
 
-                {/* Whispa preview */}
                 {feedback && (
                     <View className="px-6 mb-4">
-                        <Text
-                            className="text-[#555] text-sm leading-5"
-                            numberOfLines={2}
-                            ellipsizeMode="tail"
-                        >
-                            {feedback.text}
-                        </Text>
+                        {feedback.type === "voice" ? (
+                            <Text className="text-[#555] text-sm">🎤 {i18n.t("voiceWhispa")}</Text>
+                        ) : feedback.type === "image" ? (
+                            <Text className="text-[#555] text-sm">🖼️ {i18n.t("imageWhispa")}</Text>
+                        ) : (
+                            <Text
+                                className="text-[#555] text-sm leading-5"
+                                numberOfLines={2}
+                                ellipsizeMode="tail"
+                            >
+                                {feedback.text}
+                            </Text>
+                        )}
                     </View>
                 )}
 
@@ -111,6 +117,21 @@ export default function WhispaActionModal({ visible, feedback, onClose, onDelete
                         </View>
                         <Text className="text-white font-semibold text-base">
                             {i18n.t("shareWhispa")}
+                        </Text>
+                    </TouchableOpacity>
+
+
+
+                    {/* Report */}
+                    <TouchableOpacity
+                        onPress={onReport}
+                        className="flex-row items-center gap-4 px-4 py-4 bg-[#1a1a1a] rounded-2xl border border-[#282828]"
+                    >
+                        <View className="w-9 h-9 rounded-full bg-[#282828] items-center justify-center">
+                            <Ionicons name="flag-outline" size={18} color="#b3b3b3" />
+                        </View>
+                        <Text className="text-white font-semibold text-base">
+                            {i18n.t("reportWhispa")}
                         </Text>
                     </TouchableOpacity>
 

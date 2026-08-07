@@ -16,7 +16,7 @@ const config: ExpoConfig = {
     bundleIdentifier: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    associatedDomains: ["applinks:feedbackapp-drsj.onrender.com"],
+    associatedDomains: ["applinks:www.whispame.xyz"],
   },
 
   android: {
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
         data: [
           {
             scheme: "https",
-            host: "feedbackapp-drsj.onrender.com",
+            host: "www.whispame.xyz",
             pathPrefix: "/u"
           }
         ],

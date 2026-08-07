@@ -5,7 +5,7 @@ import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
@@ -14,7 +14,8 @@ type Feedback = {
     text: string | null;
     senderUsername?: string | null;
     audioUrl?: string | null;
-    type?: "text" | "voice";
+    type?: "text" | "voice" | "image";
+    imageUrl?: string | null;
 };
 
 type Props = {
@@ -60,9 +61,15 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
         }
     };
 
-    const handleReport = () => {
+    const handleReport = async () => {
+        if (!selectedFeedback) return;
         closeActionModal();
-        // report/block logic later
+        try {
+            await api.reportFeedback(selectedFeedback._id);
+            onUnlike(selectedFeedback._id);
+        } catch (err) {
+            console.error("Failed to report feedback:", err);
+        }
     };
 
     return (
@@ -100,28 +107,43 @@ export default function LikedOverlay({ likedFeedbacks, onClose, onUnlike }: Prop
                         <View className="bg-[#111] rounded-2xl p-5 mb-3 border border-[#282828]">
                             {/* Top row — text + dots */}
                             <View className="flex-row items-start justify-between gap-3">
-                                {item.type === "voice" && item.audioUrl ? (
-                                    <VoicePlayer audioUrl={item.audioUrl} />
-                                ) : (
-                                    <Text
-                                        className="text-white leading-6 flex-1"
-                                        style={{
-                                            fontSize: (item.text?.length || 0) > 120 ? 14 : (item.text?.length || 0) > 60 ? 15 : 16,
-                                            lineHeight: (item.text?.length || 0) > 120 ? 22 : 24,
-                                        }}
-                                    >
-                                        {item.text}
-                                    </Text>
-                                )}
+                                <View className="flex-row items-start justify-between gap-3">
+                                    <View className="flex-1 min-w-0">
+                                        {item.type === "voice" && item.audioUrl ? (
+                                            <VoicePlayer audioUrl={item.audioUrl} />
+                                        ) : item.type === "image" && item.imageUrl ? (
+                                            <Image
+                                                source={{ uri: item.imageUrl }}
+                                                style={{ width: "100%", aspectRatio: 1, borderRadius: 12 }}
+                                                resizeMode="cover"
+                                            />
+                                        ) : (
+                                            <Text
+                                                className="text-white leading-6 flex-1"
+                                                style={{
+                                                    fontSize: (item.text?.length || 0) > 120 ? 14 : (item.text?.length || 0) > 60 ? 15 : 16,
+                                                    lineHeight: (item.text?.length || 0) > 120 ? 22 : 24,
+                                                }}
+                                            >
+                                                {item.text}
+                                            </Text>
+                                        )}
+                                    </View>
 
-                                <TouchableOpacity
-                                    onPress={() => openActionModal(item)}
-                                    className="bg-[#1a1a1a] rounded-full p-2 border border-[#282828]"
-                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                    style={{ alignSelf: "flex-start" }}
-                                >
-                                    <Ionicons name="ellipsis-horizontal" size={16} color="#888" />
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => openActionModal(item)}
+                                        className="bg-[#1a1a1a] rounded-full p-2 border border-[#282828]"
+                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                    >
+                                        <Ionicons
+                                            name="ellipsis-horizontal"
+                                            size={16}
+                                            color="#888"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+
+
                             </View>
 
                             {/* Bottom row — sender username */}

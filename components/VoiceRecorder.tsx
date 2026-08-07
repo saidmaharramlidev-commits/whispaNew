@@ -109,7 +109,7 @@ export default function VoiceRecorder({ onRecordingComplete, onCancel }: Props) 
             </Pressable>
 
             <Text className="text-[#555] text-xs text-center">
-                {isRecording ? "Tap to stop" : "Max 10 seconds"}
+                {isRecording ? "Tap to stop" : "Max 8 seconds"}
             </Text>
 
             {/* Cancel */}
