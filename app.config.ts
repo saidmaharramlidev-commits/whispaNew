@@ -16,14 +16,14 @@ const config: ExpoConfig = {
     bundleIdentifier: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    associatedDomains: ["applinks:feedbackapp-drsj.onrender.com"],
+    associatedDomains: ["applinks:www.whispame.xyz"],
   },
 
   android: {
     package: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    versionCode: 2,
+    versionCode: 3,
     googleServicesFile: isDevelopment
       ? "./google-services(dev).json"
       : "./google-services.json",
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
         data: [
           {
             scheme: "https",
-            host: "feedbackapp-drsj.onrender.com",
+            host: "www.whispame.xyz",
             pathPrefix: "/u"
           }
         ],

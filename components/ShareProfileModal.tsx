@@ -12,7 +12,7 @@ type Props = {
 
 export default function ShareProfileModal({ visible, username, onClose }: Props) {
     const insets = useSafeAreaInsets();
-    const profileUrl = `https://feedbackapp-drsj.onrender.com/u/${username}`;
+    const profileUrl = `https://www.whispame.xyz/u/${username}`;
 
     const handleShareLink = async () => {
         try {
