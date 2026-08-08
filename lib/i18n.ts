@@ -183,6 +183,9 @@ const i18n = new I18n({
         swipeLike: "swipe to like",
         dailyLimitReached: "You've reached your 10 whispa daily limit.",
         dailyLimit: "Daily whispas:",
+
+        failedToUploadAvatar: "Failed to upload avatar. Please try again.",
+
     },
 
     az: {
@@ -366,6 +369,7 @@ const i18n = new I18n({
 
         dailyLimitReached: "Gündəlik 10 whispa limitinə çatdınız.",
         dailyLimit: "Gündəlik whispalar:",
+        failedToUploadAvatar: "Avatar yüklənmədi. Zəhmət olmasa yenidən cəhd edin.",
 
 
     },
