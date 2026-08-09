@@ -3,7 +3,7 @@ import { useAuth, useSignUp } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Page() {
@@ -202,151 +202,173 @@ export default function Page() {
         signUp.missingFields.length === 0
     ) {
         return (
-            <View className="flex-1 bg-black px-6" style={{ paddingTop: insets.top + 48 }}>
-                <View className="items-center mb-10">
-                    <Text className="text-white text-3xl font-bold tracking-widest">{i18n.t("appName")}</Text>
-                    <Text className="text-[#555] text-sm mt-2">{i18n.t("checkYourCode")}</Text>
-                </View>
+            <KeyboardAvoidingView
+                className="flex-1 bg-black"
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
+            >
+                <ScrollView
+                    contentContainerStyle={{ paddingTop: insets.top + 56, paddingBottom: 40 }}
+                    className="px-7"
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View className="items-center mb-12">
+                        <Text className="text-white text-4xl font-extrabold tracking-widest">{i18n.t("appName")}</Text>
+                        <Text className="text-[#555] text-base mt-3">{i18n.t("checkYourCode")}</Text>
+                    </View>
 
-                <View className="bg-[#111] border border-[#282828] rounded-3xl p-6">
-                    <Text className="text-[#888] text-xs tracking-widest uppercase mb-2">{i18n.t("code")}</Text>
-                    <TextInput
-                        className="bg-black border border-[#282828] rounded-xl px-4 py-4 text-white text-base"
-                        placeholder={i18n.t("codePlaceholder")}
-                        placeholderTextColor="#444"
-                        value={code}
-                        onChangeText={(v) => { setCode(v); setCodeError(""); }}
-                        keyboardType="numeric"
-                    />
+                    <View className="bg-[#111] border border-[#282828] rounded-[28px] p-7">
+                        <Text className="text-[#888] text-sm font-semibold tracking-widest uppercase mb-3">{i18n.t("code")}</Text>
+                        <TextInput
+                            className="bg-black border border-[#282828] rounded-2xl px-5 py-5 text-white text-lg"
+                            placeholder={i18n.t("codePlaceholder")}
+                            placeholderTextColor="#444"
+                            value={code}
+                            onChangeText={(v) => { setCode(v); setCodeError(""); }}
+                            keyboardType="numeric"
+                        />
 
-                    {codeError ? (
-                        <Text className="text-red-500 text-xs mt-2">{codeError}</Text>
-                    ) : null}
+                        {codeError ? (
+                            <Text className="text-red-500 text-sm font-medium mt-3">{codeError}</Text>
+                        ) : null}
 
-                    <Pressable
-                        className="bg-[#1DB954] rounded-full py-4 items-center mt-5"
-                        onPress={handleVerify}
-                        disabled={fetchStatus === "fetching"}
-                    >
-                        <Text
-                            className="text-black font-bold text-base"
-                            numberOfLines={1}
-                            adjustsFontSizeToFit
-                            minimumFontScale={0.8}
+                        <Pressable
+                            className="bg-[#1DB954] rounded-full py-5 items-center mt-6"
+                            onPress={handleVerify}
+                            disabled={fetchStatus === "fetching"}
                         >
-                            {fetchStatus === "fetching" ? i18n.t("verifying") : i18n.t("verify")}
-                        </Text>
-                    </Pressable>
+                            <Text
+                                className="text-black font-extrabold text-lg"
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                                minimumFontScale={0.8}
+                            >
+                                {fetchStatus === "fetching" ? i18n.t("verifying") : i18n.t("verify")}
+                            </Text>
+                        </Pressable>
 
-                    <Pressable
-                        className="mt-3 border border-[#282828] rounded-full py-4 items-center"
-                        onPress={() => signUp.verifications.sendEmailCode()}
-                    >
-                        <Text className="text-[#888] text-sm">{i18n.t("resendCode")}</Text>
-                    </Pressable>
+                        <Pressable
+                            className="mt-4 border border-[#282828] rounded-full py-5 items-center"
+                            onPress={() => signUp.verifications.sendEmailCode()}
+                        >
+                            <Text className="text-[#888] text-base font-medium">{i18n.t("resendCode")}</Text>
+                        </Pressable>
 
-                    <Pressable
-                        className="mt-3 border border-[#282828] rounded-full py-4 items-center"
-                        onPress={handleStartOver}
-                    >
-                        <Text className="text-[#888] text-sm">{i18n.t("startOver")}</Text>
-                    </Pressable>
-                </View>
-            </View>
+                        <Pressable
+                            className="mt-4 border border-[#282828] rounded-full py-5 items-center"
+                            onPress={handleStartOver}
+                        >
+                            <Text className="text-[#888] text-base font-medium">{i18n.t("startOver")}</Text>
+                        </Pressable>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         );
     }
 
     // SIGN UP SCREEN
     return (
-        <View className="flex-1 bg-black px-6" style={{ paddingTop: insets.top + 32 }}>
+        <KeyboardAvoidingView
+            className="flex-1 bg-black"
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
+        >
+            <ScrollView
+                contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 40 }}
+                className="px-7"
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
 
-            {/* Brand */}
-            <View className="items-center mb-8">
-                <View className="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#282828] items-center justify-center mb-4">
-                    <Text className="text-[#1DB954] text-2xl">💬</Text>
+                {/* Brand */}
+                <View className="items-center mb-10">
+                    <View className="w-20 h-20 rounded-full bg-[#1a1a1a] border border-[#282828] items-center justify-center mb-5">
+                        <Text className="text-[#1DB954] text-3xl">💬</Text>
+                    </View>
+                    <Text className="text-white text-4xl font-extrabold tracking-widest">{i18n.t("appName")}</Text>
+                    <Text className="text-[#555] text-base mt-3">{i18n.t("createAccount")}</Text>
+                    <View className="flex-row items-center gap-2 bg-[#1a1a1a] border border-[#282828] rounded-full px-5 py-2.5 mt-4">
+                        <View className="w-2 h-2 rounded-full bg-[#1DB954]" />
+                        <Text className="text-[#888] text-sm font-medium">{i18n.t("appAnonymousBadge")}</Text>
+                    </View>
                 </View>
-                <Text className="text-white text-3xl font-bold tracking-widest">{i18n.t("appName")}</Text>
-                <Text className="text-[#555] text-sm mt-2">{i18n.t("createAccount")}</Text>
-                <View className="flex-row items-center gap-2 bg-[#1a1a1a] border border-[#282828] rounded-full px-4 py-2 mt-3">
-                    <View className="w-1.5 h-1.5 rounded-full bg-[#1DB954]" />
-                    <Text className="text-[#888] text-xs">{i18n.t("appAnonymousBadge")}</Text>
-                </View>
-            </View>
 
-            {/* Card */}
-            <View className="bg-[#111] border border-[#282828] rounded-3xl p-6">
+                {/* Card */}
+                <View className="bg-[#111] border border-[#282828] rounded-[28px] p-7">
 
-                {/* Username */}
-                <Text className="text-[#888] text-xs tracking-widest uppercase mb-2">{i18n.t("username")}</Text>
-                <TextInput
-                    className={`bg-black border rounded-xl px-4 py-4 text-white text-base mb-1 ${usernameError ? "border-red-500" : "border-[#282828]"}`}
-                    placeholder={i18n.t("usernamePlaceholder")}
-                    placeholderTextColor="#444"
-                    value={username}
-                    onChangeText={(v) => { setUsername(v); setUsernameError(""); }}
-                    autoCapitalize="none"
-                />
-                {usernameError ? (
-                    <Text className="text-red-500 text-xs mb-3">{usernameError}</Text>
-                ) : <View className="mb-4" />}
-
-                {/* Email */}
-                <Text className="text-[#888] text-xs tracking-widest uppercase mb-2">{i18n.t("email")}</Text>
-                <TextInput
-                    className={`bg-black border rounded-xl px-4 py-4 text-white text-base mb-1 ${emailError ? "border-red-500" : "border-[#282828]"}`}
-                    placeholder={i18n.t("emailPlaceholder")}
-                    placeholderTextColor="#444"
-                    value={emailAddress}
-                    onChangeText={(v) => { setEmailAddress(v); setEmailError(""); }}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                {emailError ? (
-                    <Text className="text-red-500 text-xs mb-3">{emailError}</Text>
-                ) : <View className="mb-4" />}
-
-                {/* Password */}
-                <Text className="text-[#888] text-xs tracking-widest uppercase mb-2">{i18n.t("password")}</Text>
-                <View className="relative">
+                    {/* Username */}
+                    <Text className="text-[#888] text-sm font-semibold tracking-widest uppercase mb-3">{i18n.t("username")}</Text>
                     <TextInput
-                        className={`bg-black border rounded-xl px-4 py-4 text-white text-base pr-12 ${passwordError ? "border-red-500" : "border-[#282828]"}`}
-                        placeholder={i18n.t("passwordPlaceholder")}
+                        className={`bg-black border rounded-2xl px-5 py-5 text-white text-lg mb-1 ${usernameError ? "border-red-500" : "border-[#282828]"}`}
+                        placeholder={i18n.t("usernamePlaceholder")}
                         placeholderTextColor="#444"
-                        secureTextEntry={!showPassword}
-                        value={password}
-                        onChangeText={(v) => { setPassword(v); setPasswordError(""); }}
+                        value={username}
+                        onChangeText={(v) => { setUsername(v); setUsernameError(""); }}
+                        autoCapitalize="none"
                     />
+                    {usernameError ? (
+                        <Text className="text-red-500 text-sm font-medium mb-4 mt-1">{usernameError}</Text>
+                    ) : <View className="mb-5" />}
+
+                    {/* Email */}
+                    <Text className="text-[#888] text-sm font-semibold tracking-widest uppercase mb-3">{i18n.t("email")}</Text>
+                    <TextInput
+                        className={`bg-black border rounded-2xl px-5 py-5 text-white text-lg mb-1 ${emailError ? "border-red-500" : "border-[#282828]"}`}
+                        placeholder={i18n.t("emailPlaceholder")}
+                        placeholderTextColor="#444"
+                        value={emailAddress}
+                        onChangeText={(v) => { setEmailAddress(v); setEmailError(""); }}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    {emailError ? (
+                        <Text className="text-red-500 text-sm font-medium mb-4 mt-1">{emailError}</Text>
+                    ) : <View className="mb-5" />}
+
+                    {/* Password */}
+                    <Text className="text-[#888] text-sm font-semibold tracking-widest uppercase mb-3">{i18n.t("password")}</Text>
+                    <View className="relative">
+                        <TextInput
+                            className={`bg-black border rounded-2xl px-5 py-5 text-white text-lg pr-14 ${passwordError ? "border-red-500" : "border-[#282828]"}`}
+                            placeholder={i18n.t("passwordPlaceholder")}
+                            placeholderTextColor="#444"
+                            secureTextEntry={!showPassword}
+                            value={password}
+                            onChangeText={(v) => { setPassword(v); setPasswordError(""); }}
+                        />
+                        <Pressable
+                            onPress={() => setShowPassword(!showPassword)}
+                            className="absolute right-5 top-0 bottom-0 justify-center"
+                        >
+                            <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#555" />
+                        </Pressable>
+                    </View>
+                    {passwordError ? (
+                        <Text className="text-red-500 text-sm font-medium mt-2 mb-2">{passwordError}</Text>
+                    ) : <View className="mb-5" />}
+
                     <Pressable
-                        onPress={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-4"
+                        className="bg-[#1DB954] rounded-full py-5 items-center mt-2"
+                        onPress={handleSubmit}
+                        disabled={!emailAddress || !password || !username || fetchStatus === "fetching"}
                     >
-                        <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#555" />
+                        <Text className="text-black font-extrabold text-lg tracking-wide">
+                            {fetchStatus === "fetching" ? i18n.t("creatingAccount") : i18n.t("signUp")}
+                        </Text>
                     </Pressable>
                 </View>
-                {passwordError ? (
-                    <Text className="text-red-500 text-xs mt-1 mb-2">{passwordError}</Text>
-                ) : <View className="mb-4" />}
 
-                <Pressable
-                    className="bg-[#1DB954] rounded-full py-4 items-center mt-2"
-                    onPress={handleSubmit}
-                    disabled={!emailAddress || !password || !username || fetchStatus === "fetching"}
-                >
-                    <Text className="text-black font-bold text-base tracking-wide">
-                        {fetchStatus === "fetching" ? i18n.t("creatingAccount") : i18n.t("signUp")}
-                    </Text>
-                </Pressable>
-            </View>
+                {/* Footer */}
+                <View className="flex-row justify-center mt-8 gap-1.5">
+                    <Text className="text-[#555] text-base">{i18n.t("alreadyHaveAccount")}</Text>
+                    <Link href="/(auth)/sign-in">
+                        <Text className="text-white font-bold text-base">{i18n.t("signIn")}</Text>
+                    </Link>
+                </View>
 
-            {/* Footer */}
-            <View className="flex-row justify-center mt-6 gap-1">
-                <Text className="text-[#555]">{i18n.t("alreadyHaveAccount")}</Text>
-                <Link href="/(auth)/sign-in">
-                    <Text className="text-white font-semibold">{i18n.t("signIn")}</Text>
-                </Link>
-            </View>
-
-            <View nativeID="clerk-captcha" />
-        </View>
+                <View nativeID="clerk-captcha" />
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }

@@ -113,8 +113,11 @@ export default function UserProfileScreen() {
             const message = err?.message || "";
             if (message.includes("Daily limit reached")) {
                 setFeedbackError(i18n.t("dailyLimitReached"));
+            } else if (message.includes("inappropriate language")) {
+                setFeedbackError(i18n.t("forbiddenWord")); // reuse your existing key — same message either way
             } else {
                 console.error("Failed to send feedback:", err);
+                setFeedbackError(i18n.t("somethingWentWrong")); // catch-all so nothing fails silently
             }
         } finally {
             setFeedbackLoading(false);

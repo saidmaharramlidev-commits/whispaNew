@@ -10,7 +10,7 @@ const i18n = new I18n({
 
         // Auth - Sign In
         signIn: "Sign in",
-        signInWelcome: "Welcome Back.",
+        signInWelcome: "Good to have you back.",
         signInVerifyIdentity: "verify your identity",
         email: "Email",
         emailPlaceholder: "you@example.com",
@@ -23,7 +23,7 @@ const i18n = new I18n({
         invalidEmailOrPassword: "Invalid email or password",
 
         // Auth - Sign Up
-        createAccount: "Create Account",
+        createAccount: "Let's get you whispering",
         username: "Username",
         usernamePlaceholder: "Create a username",
         creatingAccount: "Creating account...",
@@ -197,7 +197,7 @@ const i18n = new I18n({
 
         // Auth - Sign In
         signIn: "Daxil ol",
-        signInWelcome: "Xoş gəldiniz.",
+        signInWelcome: "Yenidən xoş gəldin.",
         signInVerifyIdentity: "kimliyinizi təsdiqləyin",
         email: "E-poçt",
         emailPlaceholder: "siz@misal.com",
@@ -210,7 +210,7 @@ const i18n = new I18n({
         invalidEmailOrPassword: "E-poçt və ya şifrə yanlışdır",
 
         // Auth - Sign Up
-        createAccount: "Hesab Yarat",
+        createAccount: "Gəl whispalamağa başlayaq",
         username: "İstifadəçi adı",
         usernamePlaceholder: "İstifadəçi adı yaradın",
         creatingAccount: "Hesab yaradılır...",
