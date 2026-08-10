@@ -1,16 +1,19 @@
 import i18n from "@/lib/i18n";
 import { useAuth, useSignUp } from "@clerk/expo";
+import { useSignInWithGoogle } from "@clerk/expo/google";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 export default function Page() {
     const { signUp, fetchStatus } = useSignUp();
     const { isSignedIn } = useAuth();
     const router = useRouter();
     const insets = useSafeAreaInsets();
+
 
     const [emailAddress, setEmailAddress] = React.useState("");
     const [password, setPassword] = React.useState("");
@@ -24,11 +27,40 @@ export default function Page() {
     const [passwordError, setPasswordError] = React.useState("");
     const [codeError, setCodeError] = React.useState("");
 
+    const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
+    const [googleError, setGoogleError] = React.useState("");
+    const [googleLoading, setGoogleLoading] = React.useState(false);
+
+
     useEffect(() => {
         if (signUp.status === "missing_requirements") {
             signUp.reset();
         }
     }, []);
+
+    const handleGoogleSignIn = async () => {
+        setGoogleError("");
+        setGoogleLoading(true);
+        try {
+            const { createdSessionId, setActive } = await startGoogleAuthenticationFlow();
+
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+            }
+        } catch (err: any) {
+            if (err?.code === "SIGN_IN_CANCELLED" || err?.code === "-5") {
+                return;
+            }
+            console.error("Google sign-in failed:", err);
+            setGoogleError(
+                err?.errors?.[0]?.longMessage ||
+                err?.message ||
+                i18n.t("googleSignInFailed")
+            );
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     const parseClerkError = (err: any) => {
         const clerkErrors = err?.errors || [];
@@ -357,6 +389,29 @@ export default function Page() {
                             {fetchStatus === "fetching" ? i18n.t("creatingAccount") : i18n.t("signUp")}
                         </Text>
                     </Pressable>
+
+                    {/* Divider */}
+                    <View className="flex-row items-center gap-3 my-6">
+                        <View className="flex-1 h-px bg-[#282828]" />
+                        <Text className="text-[#555] text-sm font-medium">{i18n.t("or")}</Text>
+                        <View className="flex-1 h-px bg-[#282828]" />
+                    </View>
+
+                    {/* Google Sign-In */}
+                    <Pressable
+                        className="bg-white rounded-full py-5 items-center flex-row justify-center gap-3"
+                        onPress={handleGoogleSignIn}
+                        disabled={googleLoading}
+                    >
+                        <Ionicons name="logo-google" size={20} color="#000" />
+                        <Text className="text-black font-extrabold text-lg tracking-wide">
+                            {googleLoading ? i18n.t("signingIn") : i18n.t("continueWithGoogle")}
+                        </Text>
+                    </Pressable>
+
+                    {googleError ? (
+                        <Text className="text-red-500 text-sm font-medium mt-3 text-center">{googleError}</Text>
+                    ) : null}
                 </View>
 
                 {/* Footer */}

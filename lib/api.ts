@@ -77,6 +77,12 @@ export const useApi = () => {
 
     const getDailyCount = () => request("/feedbacks/daily-count");
 
+    const syncUser = (clerkId: string, username: string, email: string) =>
+        request("/users/sync", {
+            method: "POST",
+            body: JSON.stringify({ clerkId, username, email }),
+        });
+
     return {
         getMe,
         updateMe,
@@ -92,6 +98,7 @@ export const useApi = () => {
         toggleLikeFeedback,
         removeFollower,
         getDailyCount,
+        syncUser,
 
     };
 };

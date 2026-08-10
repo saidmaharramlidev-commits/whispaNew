@@ -186,6 +186,15 @@ const i18n = new I18n({
 
         failedToUploadAvatar: "Failed to upload avatar. Please try again.",
 
+        or: "OR",
+        continueWithGoogle: "Continue with Google",
+        googleSignInFailed: "Google sign-in failed. Please try again.",
+        chooseUsername: "Pick your username",
+        chooseUsernameSubtitle: "This is how people will find and whispa you.",
+
+        invalidCredentialsHint: "Incorrect email or password. If you signed up with Google, use Continue with Google instead.",
+
+
     },
 
     az: {
@@ -370,6 +379,15 @@ const i18n = new I18n({
         dailyLimitReached: "Gündəlik 10 whispa limitinə çatdınız.",
         dailyLimit: "Gündəlik whispalar:",
         failedToUploadAvatar: "Avatar yüklənmədi. Zəhmət olmasa yenidən cəhd edin.",
+
+        or: "VƏ YA",
+        continueWithGoogle: "Google ilə davam et",
+        googleSignInFailed: "Google ilə giriş uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.",
+
+        chooseUsername: "İstifadəçi adınızı seçin",
+        chooseUsernameSubtitle: "İnsanlar sizi bununla tapıb whispa göndərəcək.",
+
+        invalidCredentialsHint: "Yanlış e-poçt və ya şifrə. Əgər Google ilə qeydiyyatdan keçmisinizsə, Google ilə davam et düyməsindən istifadə edin.",
 
 
     },
