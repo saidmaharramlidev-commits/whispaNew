@@ -64,7 +64,6 @@ const config: ExpoConfig = {
   plugins: [
     "expo-router",
     "expo-notifications",
-    "@clerk/expo-google-signin",
     [
       "expo-splash-screen",
       {
