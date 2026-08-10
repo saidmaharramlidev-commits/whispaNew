@@ -108,6 +108,12 @@ export const useApi = () => {
     const reportFeedback = (id: string) =>
         request(`/feedbacks/${id}/report`, { method: "POST" });
 
+    const syncUser = (clerkId: string, username: string, email: string) =>
+        request("/users/sync", {
+            method: "POST",
+            body: JSON.stringify({ clerkId, username, email }),
+        });
+
     return {
         getMe,
         updateMe,
@@ -127,7 +133,11 @@ export const useApi = () => {
         deleteReply,
         getStreak,
         getDailyCount,
+<<<<<<< HEAD
         reportFeedback,
+=======
+        syncUser,
+>>>>>>> cf38836 (oauth implemented)
 
     };
 };

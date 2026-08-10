@@ -625,6 +625,11 @@
     crypto-js "^4.2.0"
     dequal "2.0.3"
 
+"@clerk/expo-google-signin@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@clerk/expo-google-signin/-/expo-google-signin-1.0.0.tgz#e050a748e92507ef7000eb37aa18a8e68e3c1d73"
+  integrity sha512-yAlLLs1RqX1IQlF/rxcVEYYin1Uo/0W5BGtvcTactC/tpP4BPsw0RW+acB6D6AbdOFrKP5+suMNpNVvmjY1cYA==
+
 "@clerk/expo@^3.3.0":
   version "3.7.3"
   resolved "https://registry.npmjs.org/@clerk/expo/-/expo-3.7.3.tgz"

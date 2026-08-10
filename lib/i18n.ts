@@ -258,6 +258,15 @@ const i18n = new I18n({
         premiumExpired: "Your Premium subscription has expired",
 
 
+        or: "OR",
+        continueWithGoogle: "Continue with Google",
+        googleSignInFailed: "Google sign-in failed. Please try again.",
+        chooseUsername: "Pick your username",
+        chooseUsernameSubtitle: "This is how people will find and whispa you.",
+
+        invalidCredentialsHint: "Incorrect email or password. If you signed up with Google, use Continue with Google instead.",
+
+
     },
 
     az: {
@@ -514,6 +523,15 @@ const i18n = new I18n({
         premiumAlreadySubscribed: "Siz artıq Premium üzvüsünüz",
         premiumCancelled: "Abunəniz ləğv edildi",
         premiumExpired: "Premium abunəniz bitib",
+
+        or: "VƏ YA",
+        continueWithGoogle: "Google ilə davam et",
+        googleSignInFailed: "Google ilə giriş uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.",
+
+        chooseUsername: "İstifadəçi adınızı seçin",
+        chooseUsernameSubtitle: "İnsanlar sizi bununla tapıb whispa göndərəcək.",
+
+        invalidCredentialsHint: "Yanlış e-poçt və ya şifrə. Əgər Google ilə qeydiyyatdan keçmisinizsə, Google ilə davam et düyməsindən istifadə edin.",
 
 
     },

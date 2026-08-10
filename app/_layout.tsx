@@ -35,17 +35,40 @@ function InitialLayout() {
   const { expoPushToken, permissionDenied } = useNotification()
   const api = useApi()
   const [showNotifModal, setShowNotifModal] = useState(false)
+  const [profileChecked, setProfileChecked] = useState(false)
+  const [hasProfile, setHasProfile] = useState(true) // assume true until checked — avoids flashing onboarding for existing users
 
-  // auth redirect
+  // check whether this signed-in user has a synced profile (username) yet
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) {
+      setProfileChecked(false)
+      return
+    }
+    api.getMe()
+      .then(() => setHasProfile(true))
+      .catch((err: any) => setHasProfile(err?.status !== 404))
+      .finally(() => setProfileChecked(true))
+  }, [isSignedIn, isLoaded])
+
+  // auth + onboarding redirect
   useEffect(() => {
     if (!isLoaded) return
     const inAuthGroup = segments[0] === '(auth)'
-    if (isSignedIn && inAuthGroup) {
-      router.replace('/(tabs)')
-    } else if (!isSignedIn && !inAuthGroup) {
+    const inOnboarding = segments[0] === ('onboarding' as any)
+
+    if (!isSignedIn && !inAuthGroup) {
       router.replace('/(auth)/sign-in' as any)
+      return
     }
-  }, [isSignedIn, isLoaded, segments])
+
+    if (isSignedIn && !profileChecked) return // wait for the check above before deciding anything
+
+    if (isSignedIn && !hasProfile && !inOnboarding) {
+      router.replace('/onboarding/complete-profile' as any)
+    } else if (isSignedIn && hasProfile && (inAuthGroup || inOnboarding)) {
+      router.replace('/(tabs)')
+    }
+  }, [isSignedIn, isLoaded, segments, profileChecked, hasProfile])
 
   // save push token to backend when signed in
   useEffect(() => {

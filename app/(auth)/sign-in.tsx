@@ -1,5 +1,6 @@
 import i18n from "@/lib/i18n";
 import { useSignIn } from "@clerk/expo";
+import { useSignInWithGoogle } from "@clerk/expo/google";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -8,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Page() {
     const { signIn, fetchStatus } = useSignIn();
+
     const insets = useSafeAreaInsets();
 
     const [emailAddress, setEmailAddress] = React.useState("");
@@ -15,23 +17,53 @@ export default function Page() {
     const [errorMessage, setErrorMessage] = React.useState("");
     const [showPassword, setShowPassword] = React.useState(false);
 
+    const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
+    const [googleError, setGoogleError] = React.useState("");
+    const [googleLoading, setGoogleLoading] = React.useState(false);
+
+
+
+
+    const handleGoogleSignIn = async () => {
+        setGoogleError("");
+        setGoogleLoading(true);
+        try {
+            const { createdSessionId, setActive } = await startGoogleAuthenticationFlow();
+
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+            }
+        } catch (err: any) {
+            if (err?.code === "SIGN_IN_CANCELLED" || err?.code === "-5") {
+                return;
+            }
+            console.error("Google sign-in failed:", err);
+            setGoogleError(
+                err?.errors?.[0]?.longMessage ||
+                err?.message ||
+                i18n.t("googleSignInFailed")
+            );
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
     const handleSubmit = async () => {
         setErrorMessage("");
         try {
             const { error } = await signIn.password({ emailAddress, password });
             if (error) {
-                setErrorMessage(error.message);
+                setErrorMessage(i18n.t("invalidCredentialsHint")); // ← changed
                 return;
             }
 
             if (signIn.status === "complete") {
                 await signIn.finalize();
-                // (auth)/_layout.tsx handles redirect via isSignedIn change
             } else {
-                setErrorMessage(i18n.t("invalidEmailOrPassword"));
+                setErrorMessage(i18n.t("invalidCredentialsHint")); // ← changed
             }
         } catch (err: any) {
-            setErrorMessage(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || i18n.t("invalidEmailOrPassword"));
+            setErrorMessage(i18n.t("invalidCredentialsHint")); // ← changed
         }
     };
 
@@ -97,6 +129,30 @@ export default function Page() {
                         {fetchStatus === "fetching" ? i18n.t("signingIn") : i18n.t("continue")}
                     </Text>
                 </Pressable>
+
+
+                {/* Divider */}
+                <View className="flex-row items-center gap-3 my-6">
+                    <View className="flex-1 h-px bg-[#282828]" />
+                    <Text className="text-[#555] text-sm font-medium">{i18n.t("or")}</Text>
+                    <View className="flex-1 h-px bg-[#282828]" />
+                </View>
+
+                {/* Google Sign-In */}
+                <Pressable
+                    className="bg-white rounded-full py-5 items-center flex-row justify-center gap-3"
+                    onPress={handleGoogleSignIn}
+                    disabled={googleLoading}
+                >
+                    <Ionicons name="logo-google" size={20} color="#000" />
+                    <Text className="text-black font-extrabold text-lg tracking-wide">
+                        {googleLoading ? i18n.t("signingIn") : i18n.t("continueWithGoogle")}
+                    </Text>
+                </Pressable>
+
+                {googleError ? (
+                    <Text className="text-red-500 text-sm font-medium mt-3 text-center">{googleError}</Text>
+                ) : null}
             </View>
 
             {/* Footer */}
