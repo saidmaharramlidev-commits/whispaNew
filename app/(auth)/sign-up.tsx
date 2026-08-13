@@ -1,12 +1,13 @@
 import i18n from "@/lib/i18n";
-import { useAuth, useSignUp } from "@clerk/expo";
-import { useSignInWithGoogle } from "@clerk/expo/google";
+import { useAuth, useSignUp, useSSO } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, { useEffect } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Page() {
     const { signUp, fetchStatus } = useSignUp();
@@ -27,9 +28,9 @@ export default function Page() {
     const [passwordError, setPasswordError] = React.useState("");
     const [codeError, setCodeError] = React.useState("");
 
-    const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
-    const [googleError, setGoogleError] = React.useState("");
+    const { startSSOFlow } = useSSO();
     const [googleLoading, setGoogleLoading] = React.useState(false);
+    const [googleError, setGoogleError] = React.useState("");
 
 
     useEffect(() => {
@@ -42,21 +43,17 @@ export default function Page() {
         setGoogleError("");
         setGoogleLoading(true);
         try {
-            const { createdSessionId, setActive } = await startGoogleAuthenticationFlow();
+            const { createdSessionId, setActive } = await startSSOFlow({
+                strategy: "oauth_google"
+            });
 
             if (createdSessionId && setActive) {
                 await setActive({ session: createdSessionId });
             }
+            // root _layout.tsx picks up isSignedIn change and routes accordingly
         } catch (err: any) {
-            if (err?.code === "SIGN_IN_CANCELLED" || err?.code === "-5") {
-                return;
-            }
             console.error("Google sign-in failed:", err);
-            setGoogleError(
-                err?.errors?.[0]?.longMessage ||
-                err?.message ||
-                i18n.t("googleSignInFailed")
-            );
+            setGoogleError(err?.errors?.[0]?.longMessage || err?.message || i18n.t("googleSignInFailed"));
         } finally {
             setGoogleLoading(false);
         }

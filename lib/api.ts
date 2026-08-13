@@ -29,7 +29,9 @@ export const useApi = () => {
 
         if (!response.ok) {
             console.log("API Error:", response.status, endpoint, JSON.stringify(data))
-            throw new Error(data.message || "Something went wrong");
+            const err = new Error(data.message || data.error || "Something went wrong") as Error & { status?: number };
+            err.status = response.status; // ← this line was missing
+            throw err;
         }
 
         return data;
