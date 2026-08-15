@@ -1,5 +1,6 @@
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
+import { useProfile } from "@/lib/ProfileContext";
 import { useAuth, useUser } from "@clerk/expo";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -10,6 +11,7 @@ export default function CompleteProfileScreen() {
     const insets = useSafeAreaInsets();
     const { user } = useUser();
     const { userId } = useAuth();
+    const { refreshProfile } = useProfile();
     const api = useApi();
 
     const [username, setUsername] = useState("");
@@ -31,7 +33,9 @@ export default function CompleteProfileScreen() {
         setLoading(true);
         try {
             const email = user?.primaryEmailAddress?.emailAddress;
+            await user?.update({ username: username.trim() });
             await api.syncUser(userId!, username.trim(), email!);
+            await refreshProfile();
             router.replace("/(tabs)" as any);
         } catch (err: any) {
             const message = err?.message || "";

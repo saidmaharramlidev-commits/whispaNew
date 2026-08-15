@@ -1,6 +1,7 @@
 import "@/global.css";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { NotificationProvider, useNotification } from "@/lib/NotificationContext";
+import { ProfileProvider, useProfile } from "@/lib/ProfileContext";
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { ClerkProvider, useAuth } from '@clerk/expo';
@@ -35,20 +36,10 @@ function InitialLayout() {
   const { expoPushToken, permissionDenied } = useNotification()
   const api = useApi()
   const [showNotifModal, setShowNotifModal] = useState(false)
-  const [profileChecked, setProfileChecked] = useState(false)
-  const [hasProfile, setHasProfile] = useState(true) // assume true until checked — avoids flashing onboarding for existing users
+  const { hasProfile, profileChecked } = useProfile();
 
   // check whether this signed-in user has a synced profile (username) yet
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) {
-      setProfileChecked(false)
-      return
-    }
-    api.getMe()
-      .then(() => setHasProfile(true))
-      .catch((err: any) => setHasProfile(err?.status !== 404))
-      .finally(() => setProfileChecked(true))
-  }, [isSignedIn, isLoaded])
+
 
   // auth + onboarding redirect
   useEffect(() => {
@@ -178,7 +169,9 @@ export default function RootLayout() {
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <NotificationProvider>
           <LanguageProvider>
-            <InitialLayout />
+            <ProfileProvider>
+              <InitialLayout />
+            </ProfileProvider>
           </LanguageProvider>
         </NotificationProvider>
       </ClerkProvider>
