@@ -327,61 +327,74 @@ export default function SettingsScreen() {
                 presentationStyle="pageSheet"
                 onRequestClose={() => setShowContactModal(false)}
             >
-                <View className="flex-1 bg-black px-6 pt-8">
-                    <View className="flex-row justify-between items-center mb-6">
-                        <Text className="text-white text-xl font-bold">{i18n.t("contactUs")}</Text>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowContactModal(false);
-                                setContactMessage('');
-                                setContactSent(false);
-                            }}
-                            className="bg-[#1a1a1a] px-4 py-2 rounded-full border border-[#282828]"
-                        >
-                            <Text className="text-[#b3b3b3] text-sm">{i18n.t("cancel")}</Text>
-                        </TouchableOpacity>
-                    </View>
+                <View className="flex-1 bg-black px-7 justify-center">
+
+                    {/* Cancel button — floating top right */}
+                    <TouchableOpacity
+                        onPress={() => {
+                            setShowContactModal(false);
+                            setContactMessage('');
+                            setContactSent(false);
+                        }}
+                        className="absolute top-8 right-6 bg-[#1a1a1a] px-4 py-2 rounded-full border border-[#282828] z-10"
+                    >
+                        <Text className="text-[#b3b3b3] text-sm font-medium">{i18n.t("cancel")}</Text>
+                    </TouchableOpacity>
 
                     {contactSent ? (
-                        <View className="flex-1 justify-center items-center gap-4">
-                            <Text className="text-4xl">✅</Text>
-                            <Text className="text-white text-lg font-bold">{i18n.t("messageSent")}</Text>
+                        <View className="items-center gap-4">
+                            <View className="w-20 h-20 rounded-full items-center justify-center">
+                                <Text className="text-4xl">✅</Text>
+                            </View>
+                            <Text className="text-white text-xl font-extrabold">{i18n.t("messageSent")}</Text>
                         </View>
                     ) : (
-                        <>
-                            <Text className="text-[#b3b3b3] text-sm mb-3">
-                                {i18n.t("contactDesc")}
-                            </Text>
-                            <TextInput
-                                className="bg-[#1a1a1a] text-white px-4 py-4 rounded-2xl border border-[#282828] mb-3"
-                                placeholder={i18n.t("contactPlaceholder")}
-                                placeholderTextColor="#555"
-                                value={contactMessage}
-                                onChangeText={setContactMessage}
-                                multiline
-                                numberOfLines={6}
-                                maxLength={1000}
-                                textAlignVertical="top"
-                            />
-                            <Text className="text-[#555] text-xs text-right mb-4">
-                                {contactMessage.length}/1000
-                            </Text>
-                            <Pressable
-                                onPress={handleContact}
-                                disabled={contactSending || !contactMessage.trim()}
-                                className="bg-white rounded-full py-4 items-center"
-                            >
-                                {contactSending ? (
-                                    <ActivityIndicator color="black" />
-                                ) : (
-                                    <Text className="text-black font-bold text-base">{i18n.t("send")}</Text>
-                                )}
-                            </Pressable>
-                        </>
+                        <View>
+                            {/* Header */}
+                            <View className="items-center mb-8">
+                                <View className="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#282828] items-center justify-center mb-4">
+                                    <Ionicons name="mail-outline" size={26} color="#1DB954" />
+                                </View>
+                                <Text className="text-white text-2xl font-extrabold mb-2">{i18n.t("contactUs")}</Text>
+                                <Text className="text-[#888] text-base text-center leading-5">
+                                    {i18n.t("contactDesc")}
+                                </Text>
+                            </View>
+
+                            {/* Card */}
+                            <View className="bg-[#111] border border-[#282828] rounded-[28px] p-6">
+                                <TextInput
+                                    className="bg-black text-white px-5 py-5 rounded-2xl border border-[#282828] text-base"
+                                    placeholder={i18n.t("contactPlaceholder")}
+                                    placeholderTextColor="#444"
+                                    value={contactMessage}
+                                    onChangeText={setContactMessage}
+                                    multiline
+                                    numberOfLines={6}
+                                    maxLength={1000}
+                                    textAlignVertical="top"
+                                    style={{ minHeight: 140 }}
+                                />
+                                <Text className="text-[#555] text-xs text-right mt-2 mb-5">
+                                    {contactMessage.length}/1000
+                                </Text>
+
+                                <Pressable
+                                    onPress={handleContact}
+                                    disabled={contactSending || !contactMessage.trim()}
+                                    className="bg-[#1DB954] rounded-full py-5 items-center"
+                                >
+                                    {contactSending ? (
+                                        <ActivityIndicator color="black" />
+                                    ) : (
+                                        <Text className="text-black font-extrabold text-lg">{i18n.t("send")}</Text>
+                                    )}
+                                </Pressable>
+                            </View>
+                        </View>
                     )}
                 </View>
             </Modal>
-
         </View>
     );
 }

@@ -34,7 +34,7 @@ export default function Page() {
 
 
     useEffect(() => {
-        if (signUp.status === "missing_requirements") {
+        if (signUp.status === "missing_requirements" || signUp.status === "complete") {
             signUp.reset();
         }
     }, []);
@@ -222,8 +222,7 @@ export default function Page() {
         setCodeError("");
     };
 
-    if (signUp.status === "complete" || isSignedIn) return null;
-
+    if (isSignedIn) return null;
     // VERIFY SCREEN
     if (
         signUp.status === "missing_requirements" &&
