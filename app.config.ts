@@ -23,7 +23,7 @@ const config: ExpoConfig = {
     package: isDevelopment
       ? "com.saidovery.whispame.dev"
       : "com.saidovery.whispame",
-    versionCode: 3,
+    versionCode: 4,
     googleServicesFile: isDevelopment
       ? "./google-services(dev).json"
       : "./google-services.json",

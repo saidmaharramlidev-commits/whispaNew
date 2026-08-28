@@ -28,6 +28,7 @@ export default function FollowListModal({ visible, type, users, currentUserFollo
     const { user: clerkUser } = useUser();
     const api = useApi();
 
+
     const handleRemoveFollower = async (username: string) => {
         try {
             onRemoveFollower?.(username) // ← remove locally first
@@ -38,6 +39,8 @@ export default function FollowListModal({ visible, type, users, currentUserFollo
             onRefresh?.(); // restore if failed
         }
     };
+
+    const followingSet = new Set(currentUserFollowing.map((id: any) => id.toString()));
 
     return (
         <Modal
@@ -94,13 +97,10 @@ export default function FollowListModal({ visible, type, users, currentUserFollo
                             <View className="flex-row items-center">
                                 <View className="flex-1">
                                     <UserCardFollow
-                                        user={{
-                                            ...item,
-                                            avatarUrl: "",
-                                            isFollowing: currentUserFollowing.some(
-                                                (id: any) => id.toString() === item._id.toString()
-                                            ),
-                                        }}
+                                        _id={item._id}
+                                        username={item.username}
+                                        bio={item.bio}
+                                        isFollowing={followingSet.has(item._id.toString())}
                                         onClose={onClose}
                                         onFollowToggle={onFollowToggle}
                                     />

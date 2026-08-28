@@ -4,7 +4,7 @@ import { containsForbiddenWord } from "@/lib/wordFilter";
 import { useUser } from "@clerk/expo";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type UserProfile = {
@@ -68,12 +68,24 @@ export default function UserProfileScreen() {
 
     const handleToggleFollow = async () => {
         if (!clerkUser || !user) return;
-        setIsFollowing(prev => !prev);
+        const wasFollowing = isFollowing;
+        setIsFollowing(!wasFollowing);
+        setUser(prev => prev ? {
+            ...prev,
+            followers: wasFollowing
+                ? prev.followers.slice(0, -1)
+                : [...prev.followers, {}],
+        } : prev);
         try {
             await api.toggleFollow(user.username);
-            await fetchUser();
         } catch (err) {
-            setIsFollowing(prev => !prev);
+            setIsFollowing(wasFollowing);
+            setUser(prev => prev ? {
+                ...prev,
+                followers: wasFollowing
+                    ? [...prev.followers, {}]
+                    : prev.followers.slice(0, -1),
+            } : prev);
             console.error("Failed to toggle follow:", err);
         }
     };
@@ -258,106 +270,97 @@ export default function UserProfileScreen() {
                 <Text className="text-[#b3b3b3] text-base">{i18n.t("back")}</Text>
             </TouchableOpacity>
 
-            <FlatList
-                data={[]}
-                keyExtractor={() => "key"}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
-                ListHeaderComponent={() => (
-                    <View className="px-6">
+            <View className="px-6">
 
-                        {/* Avatar */}
-                        <View className="items-center mt-4 mb-6">
-                            <TouchableOpacity
-                                onPress={() => setAvatarModalVisible(true)}
-                                className="mb-4"
-                            >
-                                <View className="w-24 h-24 rounded-full bg-[#1a1a1a] border border-[#282828] justify-center items-center">
-                                    {user.avatarUrl ? (
-                                        <Image
-                                            source={{ uri: user.avatarUrl }}
-                                            className="w-24 h-24 rounded-full"
-                                        />
-                                    ) : (
-                                        <Text className="text-white text-4xl font-bold">
-                                            {user.username[0].toUpperCase()}
-                                        </Text>
-                                    )}
-                                </View>
-                            </TouchableOpacity>
-                            <Text className="text-white text-xl font-bold mb-1">
-                                @{user.username}
+                {/* Avatar */}
+                <View className="items-center mt-4 mb-6">
+                    <TouchableOpacity
+                        onPress={() => setAvatarModalVisible(true)}
+                        className="mb-4"
+                    >
+                        <View className="w-24 h-24 rounded-full bg-[#1a1a1a] border border-[#282828] justify-center items-center">
+                            {user.avatarUrl ? (
+                                <Image
+                                    source={{ uri: user.avatarUrl }}
+                                    className="w-24 h-24 rounded-full"
+                                />
+                            ) : (
+                                <Text className="text-white text-4xl font-bold">
+                                    {user.username[0].toUpperCase()}
+                                </Text>
+                            )}
+                        </View>
+                    </TouchableOpacity>
+                    <Text className="text-white text-xl font-bold mb-1">
+                        @{user.username}
+                    </Text>
+                    {user.bio ? (
+                        <Text className="text-[#b3b3b3] text-sm text-center px-8">
+                            {user.bio}
+                        </Text>
+                    ) : null}
+                </View>
+
+                {/* Stats */}
+                <View className="flex-row justify-center gap-10 mb-6">
+                    {user.showFollowers !== false && (
+                        <View className="items-center">
+                            <Text className="text-white text-lg font-bold">
+                                {user.followers?.length ?? 0}
                             </Text>
-                            {user.bio ? (
-                                <Text className="text-[#b3b3b3] text-sm text-center px-8">
-                                    {user.bio}
-                                </Text>
-                            ) : null}
+                            <Text className="text-[#b3b3b3] text-sm">{i18n.t("followers")}</Text>
                         </View>
-
-                        {/* Stats */}
-                        <View className="flex-row justify-center gap-10 mb-6">
-                            {user.showFollowers !== false && (
-                                <View className="items-center">
-                                    <Text className="text-white text-lg font-bold">
-                                        {user.followers?.length ?? 0}
-                                    </Text>
-                                    <Text className="text-[#b3b3b3] text-sm">{i18n.t("followers")}</Text>
-                                </View>
-                            )}
-                            {user.showFollowing !== false && (
-                                <View className="items-center">
-                                    <Text className="text-white text-lg font-bold">
-                                        {user.following?.length ?? 0}
-                                    </Text>
-                                    <Text className="text-[#b3b3b3] text-sm">{i18n.t("following")}</Text>
-                                </View>
-                            )}
+                    )}
+                    {user.showFollowing !== false && (
+                        <View className="items-center">
+                            <Text className="text-white text-lg font-bold">
+                                {user.following?.length ?? 0}
+                            </Text>
+                            <Text className="text-[#b3b3b3] text-sm">{i18n.t("following")}</Text>
                         </View>
+                    )}
+                </View>
 
-                        {/* Follow Button */}
-                        {clerkUser?.username !== user.username && (
-                            <TouchableOpacity
-                                onPress={handleToggleFollow}
-                                className={`rounded-full py-3 items-center mb-4 ${isFollowing ? "bg-[#1a1a1a] border border-[#282828]" : "bg-white"}`}
-                            >
-                                <Text className={`font-bold text-base ${isFollowing ? "text-white" : "text-black"}`}>
-                                    {isFollowing ? i18n.t("unfollow") : i18n.t("follow")}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                {/* Follow Button */}
+                {clerkUser?.username !== user.username && (
+                    <TouchableOpacity
+                        onPress={handleToggleFollow}
+                        className={`rounded-full py-3 items-center mb-4 ${isFollowing ? "bg-[#1a1a1a] border border-[#282828]" : "bg-white"}`}
+                    >
+                        <Text className={`font-bold text-base ${isFollowing ? "text-white" : "text-black"}`}>
+                            {isFollowing ? i18n.t("unfollow") : i18n.t("follow")}
+                        </Text>
+                    </TouchableOpacity>
+                )}
 
-                        {/* Send Whispa */}
-                        {!user.isAcceptingFeedback ? (
-                            <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
-                                <Text className="text-[#555] font-semibold text-base text-center">
-                                    {i18n.t("inboxClosed")}
-                                </Text>
-                            </View>
-                        ) : canWhispa ? (
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setFeedbackModalVisible(true)
-                                    fetchDailyCount();
-                                }}
-                                className="bg-[#1a1a1a] border border-[#282828] rounded-full py-3 items-center"
-                            >
-                                <Text className="text-white font-semibold text-base">
-                                    {i18n.t("sendAnonymousWhispa")}
-                                </Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
-                                <Text className="text-[#555] font-semibold text-base text-center">
-                                    {i18n.t("userDoesntFollowBack")}
-                                </Text>
-                            </View>
-                        )}
-
+                {/* Send Whispa */}
+                {!user.isAcceptingFeedback ? (
+                    <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
+                        <Text className="text-[#555] font-semibold text-base text-center">
+                            {i18n.t("inboxClosed")}
+                        </Text>
+                    </View>
+                ) : canWhispa ? (
+                    <TouchableOpacity
+                        onPress={() => {
+                            setFeedbackModalVisible(true)
+                            fetchDailyCount();
+                        }}
+                        className="bg-[#1a1a1a] border border-[#282828] rounded-full py-3 items-center"
+                    >
+                        <Text className="text-white font-semibold text-base">
+                            {i18n.t("sendAnonymousWhispa")}
+                        </Text>
+                    </TouchableOpacity>
+                ) : (
+                    <View className="bg-[#1a1a1a] border border-[#282828] rounded-2xl px-5 py-4 items-center gap-2">
+                        <Text className="text-[#555] font-semibold text-base text-center">
+                            {i18n.t("userDoesntFollowBack")}
+                        </Text>
                     </View>
                 )}
-                renderItem={() => null}
-            />
+
+            </View>
         </View>
     );
 }

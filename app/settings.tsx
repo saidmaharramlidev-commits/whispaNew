@@ -50,12 +50,10 @@ export default function SettingsScreen() {
 
     const handleUpdate = async (updates: object) => {
         try {
-            setSaving(true);
             await api.updateMe(updates);
         } catch (err) {
             console.error("Failed to update:", err);
         } finally {
-            setSaving(false);
         }
     };
 

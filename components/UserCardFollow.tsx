@@ -1,7 +1,7 @@
 import { useApi } from "@/lib/api";
 import i18n from "@/lib/i18n";
 import { router } from "expo-router";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type User = {
@@ -13,22 +13,24 @@ type User = {
 };
 
 type Props = {
-    user: User;
+    _id: string;
+    username: string;
+    bio: string;
+    isFollowing: boolean;
     onClose?: () => void;
     onFollowToggle?: () => void;
 };
-
-export default function UserCardFollow({ user, onClose, onFollowToggle }: Props) {
+function UserCardFollow({ _id, username, bio, isFollowing, onClose, onFollowToggle }: Props) {
     const api = useApi();
-    const [isFollowing, setIsFollowing] = useState(user.isFollowing);
+    const [isFollowingstate, setIsFollowingstate] = useState(isFollowing);
 
     const handleToggleFollow = async () => {
-        setIsFollowing(prev => !prev);
+        setIsFollowingstate(prev => !prev);
         try {
-            await api.toggleFollow(user.username);
+            await api.toggleFollow(username);
             onFollowToggle?.();
         } catch (err) {
-            setIsFollowing(prev => !prev);
+            setIsFollowingstate(prev => !prev);
             console.error("Failed to toggle follow:", err);
         }
     };
@@ -39,7 +41,7 @@ export default function UserCardFollow({ user, onClose, onFollowToggle }: Props)
                 onClose?.();
                 router.push({
                     pathname: "/user/[username]",
-                    params: { username: user.username }
+                    params: { username: username }
                 });
             }}
             className="flex-row items-center gap-4 py-4 border-b border-[#1a1a1a]"
@@ -47,18 +49,18 @@ export default function UserCardFollow({ user, onClose, onFollowToggle }: Props)
             {/* Avatar */}
             <View className="w-12 h-12 rounded-full bg-[#1a1a1a] border border-[#282828] justify-center items-center">
                 <Text className="text-white text-lg font-bold">
-                    {user.username[0].toUpperCase()}
+                    {username[0].toUpperCase()}
                 </Text>
             </View>
 
             {/* Info */}
             <View className="flex-1">
                 <Text className="text-white font-semibold text-base">
-                    {user.username}
+                    {username}
                 </Text>
-                {user.bio ? (
+                {bio ? (
                     <Text className="text-[#b3b3b3] text-sm" numberOfLines={1}>
-                        {user.bio}
+                        {bio}
                     </Text>
                 ) : null}
             </View>
@@ -69,12 +71,15 @@ export default function UserCardFollow({ user, onClose, onFollowToggle }: Props)
                     e.stopPropagation();
                     handleToggleFollow();
                 }}
-                className={`px-4 py-2 rounded-full border ${isFollowing ? "bg-[#1a1a1a] border-[#282828]" : "bg-white border-white"}`}
+                className={`px-4 py-2 rounded-full border ${isFollowingstate ? "bg-[#1a1a1a] border-[#282828]" : "bg-white border-white"}`}
             >
-                <Text className={`text-sm font-bold ${isFollowing ? "text-white" : "text-black"}`}>
-                    {isFollowing ? i18n.t("unfollow") : i18n.t("follow")}
+                <Text className={`text-sm font-bold ${isFollowingstate ? "text-white" : "text-black"}`}>
+                    {isFollowingstate ? i18n.t("unfollow") : i18n.t("follow")}
                 </Text>
             </TouchableOpacity>
+
         </TouchableOpacity>
     );
 }
+
+export default memo(UserCardFollow);

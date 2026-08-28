@@ -42,26 +42,30 @@ export default function HomeScreen() {
     }
   }, [isLoaded, isSignedIn]);
 
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = async (showLoader = true) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
       const data = await api.getMyFeedbacks();
       setFeedbacks(data.data);
       setCurrentIndex(0);
     } catch (err) {
       console.error("Failed to load feedbacks:", err);
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   };
 
   const fetchUsername = async () => {
     try {
-      const data = await api.getMe();
-      if (!data?.data) return;
-      setUsername(data.data.username);
+      const [meData, countData] = await Promise.all([
+        api.getMe(),
+        api.getDailyCount(),
+      ]);
 
-      const countData = await api.getDailyCount();
+      if (meData?.data) {
+        setUsername(meData.data.username);
+      }
+
       setDailyCount(countData.data.count);
     } catch (err) {
       console.error("Failed to fetch username:", err);
@@ -79,7 +83,12 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchFeedbacks(), fetchLikedFeedbacks()]);
+
+    await Promise.all([
+      fetchFeedbacks(false),
+      fetchLikedFeedbacks(),
+    ]);
+
     setRefreshing(false);
   };
 
@@ -88,8 +97,7 @@ export default function HomeScreen() {
     setCurrentIndex(prev => prev + 1);
     try {
       await api.toggleLikeFeedback(feedback._id);
-      const data = await api.getLikedFeedbacks();
-      setLikedFeedbacks(data.data);
+      setLikedFeedbacks(prev => [...prev, { ...feedback, isLiked: true }]);
     } catch (err) {
       console.error("Failed to like feedback:", err);
     }
